@@ -18,12 +18,12 @@ public class GlobalExceptionHandler {
 	 * Tanımlaması yapılmayan diğer tüm hataları yakalamak için RuntimeException yakalayın.
 	 *
 	 */
-	@ExceptionHandler(RuntimeException.class)
-	@ResponseBody
-	public ResponseEntity<ErrorMessage> runtimeExceptionHandler(RuntimeException exception){
-		System.out.println(exception.getMessage());
-		return createResponseEntity(ErrorType.INTERNAL_SERVER_ERROR,HttpStatus.INTERNAL_SERVER_ERROR,null);
-	}
+//	@ExceptionHandler(RuntimeException.class)
+//	@ResponseBody
+//	public ResponseEntity<ErrorMessage> runtimeExceptionHandler(RuntimeException exception){
+//		System.out.println(exception.getMessage());
+//		return createResponseEntity(ErrorType.INTERNAL_SERVER_ERROR,HttpStatus.INTERNAL_SERVER_ERROR,null);
+//	}
 
 	
 	@ExceptionHandler(EticaretException.class)

@@ -1,5 +1,6 @@
 package com.haruns.eticaretapp.dto.request;
 
+import com.haruns.eticaretapp.entity.enums.ProductCategory;
 import jakarta.validation.constraints.NotNull;
 
 public record AddProductRequestDto(
@@ -12,6 +13,9 @@ public record AddProductRequestDto(
 		@NotNull
 		Double price,
 		@NotNull
-		Integer stock
+		Integer stock,
+		@NotNull
+		Long categoryId
+		
 ) {
 }

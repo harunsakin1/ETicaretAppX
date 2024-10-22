@@ -1,5 +1,6 @@
 package com.haruns.eticaretapp.entity;
 
+import com.haruns.eticaretapp.entity.enums.ProductCategory;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,5 +17,6 @@ public class Category {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Long id;
+	@Column(unique = true)
 	String name;
 }

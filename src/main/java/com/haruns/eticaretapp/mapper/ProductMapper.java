@@ -10,4 +10,5 @@ import org.mapstruct.factory.Mappers;
 public interface ProductMapper {
 	ProductMapper INSTANCE = Mappers.getMapper(ProductMapper.class);
 	
+	Product fromAddProductDto(final AddProductRequestDto dto);
 }

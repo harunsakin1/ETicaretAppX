@@ -11,6 +11,8 @@ public class RestApis {
 	
 	public static final String USER=ROOT+"/user";
 	public static final String PRODUCT=ROOT+"/product";
+	public static final String PRODUCT_IMAGE=ROOT+"/product-image";
+	public static final String CATEGORY=ROOT+"/category";
 	
 	public static final String REGISTER="/register";
 	public static final String STORE_REGISTER="/store-register";
@@ -18,6 +20,11 @@ public class RestApis {
 	public static final String GET_MY_PROFILE="/get-my-profile";
 	public static final String UPDATE_MY_PROFILE="/update-my-profile";
 	public static final String UPDATE_MY_STORE_PROFILE="/update-my-store-profile";
+	public static final String ADD_IMAGE_TO_PRODUCT="/add-image-to-product";
+	public static final String ADD_CATEGORY="/add-category";
+	public static final String CONFIRM_PRODUCT_STATUS="/confirm-product-status";
+	public static final String GET_PENDING_PRODUCTS="/get-pending-products";
+	
 	
 	
 	public static final String ADD_PRODUCT="/add-product";

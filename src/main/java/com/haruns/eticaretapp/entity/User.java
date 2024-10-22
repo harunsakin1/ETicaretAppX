@@ -2,6 +2,7 @@ package com.haruns.eticaretapp.entity;
 
 import com.haruns.eticaretapp.entity.enums.Role;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,6 +20,7 @@ public class User {
 	Long id;
 	String name;
 	String surname;
+	@Email
 	String email;
 	String phone;
 	Role role;
