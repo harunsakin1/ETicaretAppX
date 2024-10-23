@@ -3,18 +3,17 @@ package com.haruns.eticaretapp.entity;
 import com.haruns.eticaretapp.entity.enums.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
+
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 @Data
 @Entity
 @Table(name = "tbluser")
-public class User {
+public class User extends BaseEntity{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Long id;
@@ -23,8 +22,11 @@ public class User {
 	@Email
 	String email;
 	String phone;
+	@Enumerated(EnumType.STRING)
 	Role role;
 	String password;
 	String taxNo;
 	String storeName;
+	
+	
 }

@@ -1,9 +1,11 @@
 package com.haruns.eticaretapp.controller;
 
 import com.haruns.eticaretapp.dto.request.AddProductRequestDto;
+import com.haruns.eticaretapp.dto.request.UpdateProductRequestDto;
 import com.haruns.eticaretapp.dto.response.BaseResponse;
 import com.haruns.eticaretapp.entity.Product;
 import com.haruns.eticaretapp.service.ProductService;
+import com.haruns.eticaretapp.view.VwProduct;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -50,5 +52,38 @@ public class ProductController {
 		                                     .data(true)
 		                                     .success(true)
 		                                     .build());
+	}
+	
+	@PutMapping(UPDATE_PRODUCT)
+	public ResponseEntity<BaseResponse<Boolean>> updateProduct(String token, @RequestBody @Valid UpdateProductRequestDto dto){
+		productService.updateProduct(token, dto);
+		return ResponseEntity.ok(BaseResponse.<Boolean>builder()
+				                         .code(200)
+				                         .message("Ürün başarıyla güncellendi.")
+				                         .data(true)
+				                         .success(true)
+		                                     .build());
+	}
+	
+	@DeleteMapping(DELETE_PRODUCT)
+	public ResponseEntity<BaseResponse<Boolean>> deleteProduct(String token,Long productId){
+		productService.deleteProduct(token,productId);
+		return ResponseEntity.ok(BaseResponse.<Boolean>builder()
+				                         .code(200)
+				                         .message("Ürün başarıyla silindi.")
+				                         .data(true)
+				                         .success(true)
+		                                     .build());
+	}
+	
+	@GetMapping(GET_CONFIRMED_PRODUCTS)
+	public ResponseEntity<BaseResponse<List<Product>>> getAllConfirmedProducts(String token){
+		return ResponseEntity.ok(BaseResponse.<List<Product>>builder()
+				                         .code(200)
+				                         .message("Tüm confirmed ürünler getirildi.")
+				                         .success(true)
+				                         .data(productService.getAllConfirmedProducts(token))
+		                                     .build());
+	
 	}
 }

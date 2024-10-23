@@ -4,8 +4,6 @@ import jakarta.validation.constraints.NotNull;
 
 public record AddImageToProductRequestDto(
 		@NotNull
-		Long productId,
-		@NotNull
-		String url
+		Long productId
 ) {
 }

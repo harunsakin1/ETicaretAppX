@@ -19,7 +19,16 @@ spring:
     properties:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
 java15:
   jwt:
     secret-key: ${ETICARET_SECRETKEY}
     issuer: ${ETICARET_ISSUER}
+
+cloudinary:
+  cloud_name: ${CLOUD_NAME}
+  api_key: ${CLOUD_API_KEY}
+  api_secret: ${CLOUD_API_SECRET}
