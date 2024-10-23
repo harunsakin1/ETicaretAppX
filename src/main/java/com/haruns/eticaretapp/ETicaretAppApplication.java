@@ -1,5 +1,6 @@
 package com.haruns.eticaretapp;
 
+import com.haruns.eticaretapp.utility.EncryptionManager;
 import lombok.Builder;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -29,6 +29,7 @@ public class RestApis {
 	public static final String DELETE_PRODUCT="/delete-product";
 	public static final String GET_PENDING_PRODUCTS="/get-pending-products";
 	public static final String GET_CONFIRMED_PRODUCTS="/get-confirmed-products";
+	public static final String VERIFY_ACCOUNT="/verify-account";
 	
 	
 	

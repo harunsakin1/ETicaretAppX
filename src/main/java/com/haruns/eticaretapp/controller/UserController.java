@@ -13,6 +13,12 @@ import lombok.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+
 import static com.haruns.eticaretapp.constant.RestApis.*;
 
 @RestController
@@ -22,7 +28,9 @@ public class UserController {
 	private final UserService userService;
 	
 	@PostMapping(REGISTER)
-	public ResponseEntity<BaseResponse<Boolean>> register(@RequestBody @Valid UserRegisterRequestDto dto){
+	public ResponseEntity<BaseResponse<Boolean>> register(@RequestBody @Valid UserRegisterRequestDto dto)
+			throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException,
+			       InvalidKeyException {
 		if (!dto.password().equals(dto.rePassword())) {
 			throw new EticaretException(ErrorType.PASSWORD_ERROR);
 		}
@@ -34,7 +42,16 @@ public class UserController {
 				                         .message("Kayıt başarıyla oluşturuldu.")
 		                                 .build());
 	}
-	
+	@GetMapping(VERIFY_ACCOUNT)
+	public ResponseEntity<BaseResponse<Boolean>> verifyAccount(@RequestParam("token") String token){
+		userService.verifyAccount(token);
+		return ResponseEntity.ok(BaseResponse.<Boolean>builder()
+				                         .code(200)
+				                         .message("Kullanıcı kaydı onaylandı.")
+				                         .data(true)
+				                         .success(true)
+				                         .build());
+	}
 	@PostMapping(LOGIN)
 	public ResponseEntity<BaseResponse<String>> doLogin(@RequestBody @Valid LoginRequestDto dto){
 		String token=userService.login(dto);

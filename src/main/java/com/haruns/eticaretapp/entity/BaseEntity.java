@@ -18,5 +18,5 @@ public class BaseEntity {
 	Long createdDate=System.currentTimeMillis();
 	@Builder.Default
 	@Enumerated(EnumType.STRING)
-	State state=State.ACTIVE;
+	State state=State.INACTIVE;
 }

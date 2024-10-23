@@ -14,10 +14,12 @@ public class MailService {
 	@Autowired
 	private JavaMailSenderImpl mailSender;
 	
-	public void sendEmail(String alici,String konu, String body){
+	public void sendEmail(String alici,String token){
+		String url="http://localhost:8080/v1/dev/user/verify-account?token="+token;
+		String body="Hesabınızı onaylamak için aşagıdaki linke tıklayınız. "+url;
 		SimpleMailMessage message = new SimpleMailMessage();
 		message.setTo(alici);
-		message.setSubject(konu);
+		message.setSubject("Kayıt Onayı");
 		message.setText(body);
 		mailSender.send(message);
 	}

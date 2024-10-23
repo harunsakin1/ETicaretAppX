@@ -4,22 +4,32 @@ import com.haruns.eticaretapp.dto.request.*;
 import com.haruns.eticaretapp.dto.response.GetMyProfileResponseDto;
 import com.haruns.eticaretapp.dto.response.IMyProfile;
 import com.haruns.eticaretapp.entity.User;
+import com.haruns.eticaretapp.entity.VerificationToken;
 import com.haruns.eticaretapp.entity.enums.Role;
+import com.haruns.eticaretapp.entity.enums.State;
 import com.haruns.eticaretapp.exception.ErrorType;
 import com.haruns.eticaretapp.exception.EticaretException;
 import com.haruns.eticaretapp.mapper.UserMapper;
 import com.haruns.eticaretapp.repository.UserRepository;
+import com.haruns.eticaretapp.utility.EncryptionManager;
 import com.haruns.eticaretapp.utility.JwtManager;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
 	private final UserRepository userRepository;
+	private final VerificationTokenService verificationTokenService;
 	private final JwtManager jwtManager;
 	private final MailService mailService;
 	
@@ -27,12 +37,21 @@ public class UserService {
 		return userRepository.findById(id);
 	}
 	
-	
-	public void register(UserRegisterRequestDto dto) {
+	public String generateVerificationToken(Long userId) {
+		String token= UUID.randomUUID().toString();
+		VerificationToken verificationToken = new VerificationToken(token, userId);
+		verificationTokenService.save(verificationToken);
+		return token;
+	}
+	public void register(UserRegisterRequestDto dto)
+			throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException,
+			       InvalidKeyException {
 		User user= UserMapper.INSTANCE.fromRegisterDto(dto);
 		user.setRole(Role.USER);
+		String encryptedPassword = EncryptionManager.encrypt(dto.password());
+		user.setPassword(encryptedPassword);
 		userRepository.save(user);
-		mailService.sendEmail(user.getEmail(),"KAYIT HAKKINDA","Başarıyla kayıt yapıldı.");
+		mailService.sendEmail(user.getEmail(),generateVerificationToken(user.getId()));
 	}
 	
 	
@@ -40,7 +59,7 @@ public class UserService {
 		User user=UserMapper.INSTANCE.fromStoreRegisterDto(dto);
 		user.setRole(Role.SELLER);
 		userRepository.save(user);
-		mailService.sendEmail(user.getEmail(),"KAYIT HAKKINDA","Başarıyla kayıt yapıldı.");
+		mailService.sendEmail(user.getEmail(),generateVerificationToken(user.getId()));
 	}
 	
 	public String login(LoginRequestDto dto) {
@@ -100,5 +119,19 @@ public class UserService {
 		User user=UserMapper.INSTANCE.fromUpdateMyStoreProfileDto(dto);
 		user.setId(optUser.get().getId());
 		userRepository.save(user);
+	}
+	
+	public void verifyAccount(String token) {
+		VerificationToken verificationToken = verificationTokenService.findByToken(token);
+		if (verificationToken == null) {
+			throw new EticaretException(ErrorType.INVALID_TOKEN);
+		}
+		Long userId = verificationToken.getUserId();
+		Optional<User> optUser = userRepository.findById(userId);
+		if (optUser.isEmpty()){
+			throw new EticaretException(ErrorType.USER_NOT_FOUND);
+		}
+		optUser.get().setState(State.ACTIVE);
+		userRepository.save(optUser.get());
 	}
 }
