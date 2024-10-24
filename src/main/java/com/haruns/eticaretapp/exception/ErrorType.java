@@ -13,8 +13,12 @@ public enum ErrorType {
 	INVALID_USERNAME_OR_PASSWORD(6002,"Kullanıcı adı veya şifre yanlış.",HttpStatus.BAD_REQUEST),
 	INVALID_TOKEN(9001,"Geçersiz token bilgisi.",HttpStatus.BAD_REQUEST),
 	USER_NOT_FOUND(6003,"Kullanıcı bulunamadı.",HttpStatus.NOT_FOUND),
+	USER_NOT_CONFIRMED(6004,"Üyelik onaylanmadı.",HttpStatus.BAD_REQUEST),
 	PRODUCT_NOT_FOUND(7003,"Ürün bulunamadı.",HttpStatus.NOT_FOUND),
-	UNAUTHORIZED(7003,"Yetkiniz bulunmamaktadır.",HttpStatus.UNAUTHORIZED);
+	CATEGORY_NOT_FOUND(5001,"Kategori bulunamadı.",HttpStatus.NOT_FOUND),
+	UNAUTHORIZED(7003,"Yetkiniz bulunmamaktadır.",HttpStatus.UNAUTHORIZED),
+	EXP_TOKEN_DATE(8001,"Token'in geçerlilik tarihi geçmiştir.",HttpStatus.BAD_REQUEST);
+	
 	
 	
 	

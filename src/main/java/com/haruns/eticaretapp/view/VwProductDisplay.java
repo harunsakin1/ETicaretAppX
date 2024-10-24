@@ -9,12 +9,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Data
-public class VwProduct {
-	Long id;
-	Long categoryId;
-	String name;
-	String description;
-	String brand;
-	Double totalRating;
-	
+public class VwProductDisplay {
+	String categoryName;
+	String storeName;
+	Double price;
+	String url;
+	VwProduct vwProduct;
 }

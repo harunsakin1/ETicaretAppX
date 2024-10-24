@@ -3,6 +3,10 @@ package com.haruns.eticaretapp.controller;
 import com.haruns.eticaretapp.dto.request.AddImageToProductRequestDto;
 import com.haruns.eticaretapp.dto.response.BaseResponse;
 import com.haruns.eticaretapp.service.ProductImageService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -20,16 +24,14 @@ import static com.haruns.eticaretapp.constant.RestApis.*;
 public class ProductImageController {
 	private final ProductImageService productImageService;
 	
-	@PostMapping(value = ADD_IMAGE_TO_PRODUCT,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<BaseResponse<Boolean>> addImageToProduct(String token, @ModelAttribute @Valid AddImageToProductRequestDto dto,MultipartFile file)
+	@PostMapping(value = ADD_IMAGE_TO_PRODUCT, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<BaseResponse<Boolean>> addImageToProduct(String token,
+	                                                               @ModelAttribute @Valid AddImageToProductRequestDto dto, MultipartFile file)
 			throws IOException {
-		productImageService.addImageToProduct(token,dto,file);
-		return ResponseEntity.ok(BaseResponse.<Boolean>builder()
-				                         .success(true)
-				                         .code(200)
-				                         .data(true)
-				                         .message("Resim eklendi")
-		                                     .build());
+		productImageService.addImageToProduct(token, dto, file);
+		return ResponseEntity.ok(BaseResponse.<Boolean>builder().success(true).code(200).data(true)
+		                                     .message("Resim eklendi").build());
 		
 	}
+	
 }

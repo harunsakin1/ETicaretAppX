@@ -7,6 +7,7 @@ import com.haruns.eticaretapp.entity.User;
 import com.haruns.eticaretapp.entity.VerificationToken;
 import com.haruns.eticaretapp.entity.enums.Role;
 import com.haruns.eticaretapp.entity.enums.State;
+import com.haruns.eticaretapp.entity.enums.UserStatus;
 import com.haruns.eticaretapp.exception.ErrorType;
 import com.haruns.eticaretapp.exception.EticaretException;
 import com.haruns.eticaretapp.mapper.UserMapper;
@@ -22,6 +23,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -37,12 +39,6 @@ public class UserService {
 		return userRepository.findById(id);
 	}
 	
-	public String generateVerificationToken(Long userId) {
-		String token= UUID.randomUUID().toString();
-		VerificationToken verificationToken = new VerificationToken(token, userId);
-		verificationTokenService.save(verificationToken);
-		return token;
-	}
 	public void register(UserRegisterRequestDto dto)
 			throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException,
 			       InvalidKeyException {
@@ -67,6 +63,9 @@ public class UserService {
 				userRepository.findOptionalByEmailAndPassword(dto.email(), dto.password());
 		if (optUser.isEmpty()) {
 			throw new EticaretException(ErrorType.INVALID_USERNAME_OR_PASSWORD);
+		}
+		if (!optUser.get().getStatus().equals(UserStatus.ACTIVE)) {
+			throw new EticaretException(ErrorType.USER_NOT_CONFIRMED);
 		}
 		return createToken(optUser);
 	}
@@ -121,17 +120,36 @@ public class UserService {
 		userRepository.save(user);
 	}
 	
-	public void verifyAccount(String token) {
-		VerificationToken verificationToken = verificationTokenService.findByToken(token);
+	public String generateVerificationToken(Long userId) {
+		StringBuilder verificationTokenSB= new StringBuilder();
+		String token= UUID.randomUUID().toString();
+		verificationTokenSB.append(token.substring(0,16));
+		verificationTokenSB.append(System.currentTimeMillis()+(1000*60));
+		VerificationToken verificationToken = new VerificationToken(verificationTokenSB.toString(), userId);
+		verificationTokenService.save(verificationToken);
+		return verificationTokenSB.toString();
+	}
+	
+	public void verifyAccount(String verificationTokenSB) {
+		VerificationToken verificationToken = verificationTokenService.findByToken(verificationTokenSB);
+		
 		if (verificationToken == null) {
 			throw new EticaretException(ErrorType.INVALID_TOKEN);
+		}
+		Long expDate= Long.parseLong(verificationTokenSB.substring(16));
+		if (expDate<System.currentTimeMillis()) {
+			throw new EticaretException(ErrorType.EXP_TOKEN_DATE);
 		}
 		Long userId = verificationToken.getUserId();
 		Optional<User> optUser = userRepository.findById(userId);
 		if (optUser.isEmpty()){
 			throw new EticaretException(ErrorType.USER_NOT_FOUND);
 		}
-		optUser.get().setState(State.ACTIVE);
+		optUser.get().setStatus(UserStatus.ACTIVE);
 		userRepository.save(optUser.get());
+	}
+	
+	public List<String>findAllStoreNameByIds(List<Long> ids) {
+		return userRepository.findAllStoreNameByIds(ids);
 	}
 }

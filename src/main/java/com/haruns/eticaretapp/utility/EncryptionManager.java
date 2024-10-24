@@ -12,7 +12,7 @@ import java.util.Base64;
 public class EncryptionManager {
 	private static final String ALGORITHM="AES";
 	private static final String KEY = "qAz1+!rUt7w$eS5#";
-	
+	//MEHMETERTOP99 -> qAz1+!rUt7w$eS5#SDLKGAGJI3881334£>$>£½1TWEQT1£$>
 	public static String encrypt(String data)
 			throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException,
 			       BadPaddingException {
@@ -22,7 +22,7 @@ public class EncryptionManager {
 		byte[] encryptedData= cipher.doFinal(data.getBytes());
 		return Base64.getEncoder().encodeToString(encryptedData);
 	}
-	
+	//qAz1+!rUt7w$eS5#SDLKGAGJI3881334£>$>£½1TWEQT1£$ -> MEHMETERTOP99
 	public static String decrypt(String data)
 			throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException,
 			       BadPaddingException {

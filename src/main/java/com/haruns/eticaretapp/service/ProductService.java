@@ -16,11 +16,18 @@ import com.haruns.eticaretapp.repository.UserRepository;
 import com.haruns.eticaretapp.utility.JwtManager;
 import com.haruns.eticaretapp.utility.ProductCodeGenerator;
 import com.haruns.eticaretapp.view.VwProduct;
+import com.haruns.eticaretapp.view.VwProductDisplay;
+import com.haruns.eticaretapp.view.VwProductSeller;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,8 +38,14 @@ public class ProductService {
 	private final JwtManager jwtManager;
 	private final ProductSellerRepository productSellerRepository;
 	private final UserRepository userRepository;
+	private final CategoryService categoryService;
+	private final ProductImageService productImageService;
+	private Random random=new Random();
 	
 	public void addProduct(String token, AddProductRequestDto dto) {
+		if (!categoryService.existById(dto.categoryId())){
+			throw new EticaretException(ErrorType.CATEGORY_NOT_FOUND);
+		}
 		Optional<User> optUser = sellerTokenControl(token);
 		Product product= Product.builder()
 					.name(dto.name())
@@ -127,18 +140,34 @@ public class ProductService {
 		}
 	}
 	
-	public List<Product> getAllConfirmedProducts(String token) {
-		Optional<Long> optUserId = jwtManager.validateToken(token);
-		if (optUserId.isEmpty()){
-			throw new EticaretException(ErrorType.INVALID_TOKEN);
-		}
-		Optional<User> optUser = userRepository.findById(optUserId.get());
-		if (optUser.isEmpty()){
-			throw new EticaretException(ErrorType.USER_NOT_FOUND);
-		}
-		if (!optUser.get().getRole().equals(Role.USER)){
-			throw new EticaretException(ErrorType.UNAUTHORIZED);
-		}
-		return productRepository.findAllByStatus(ProductStatus.ACCEPTED);
-	}
+//	public List<VwProductDisplay> getAllConfirmedProducts() {
+//		Pageable pageable= PageRequest.of(0, 20);
+//		List<VwProduct> productList = productRepository.getNeededFields(pageable);
+//		List<Long> productIds=new ArrayList<>();
+//		productList.forEach(p->{
+//			productIds.add(p.getId());
+//		});
+//		List<VwProductSeller> productSellerList = productSellerService.getNeededFields(pageable, productIds);
+//		List<Long>userIds=new ArrayList<>();
+//		productSellerList.forEach(u->{
+//			userIds.add(u.getUserId());
+//		                          });
+//		List<String> allStoreName = userService.findAllStoreNameByIds(userIds);
+//		List<String> allCategoryName = categoryService.findNameByIdIn(productList.stream().map(VwProduct::getCategoryId)
+//		                                                                    .collect(Collectors.toList()));
+//		List<String> allUrls =
+//				productImageService.findUrlByProductIdIn(productList.stream().map(VwProduct::getId)
+//				                                                    .collect(Collectors.toList()));
+//		List<VwProductDisplay> allProductFields=new ArrayList<>();
+//		for (int i = 0; i < 20; i++) {
+//			allProductFields.add(VwProductDisplay.builder()
+//					                     .vwProduct(productList.get(i))
+//					                     .storeName(allStoreName.get())
+//					                     .price(productSellerList.get(i).getPrice())
+//					                     .url(allUrls.get(i))
+//					                     .categoryName(allCategoryName.get())
+//			                                     .build());
+//		}
+//		return allProductFields;
+//	}
 }

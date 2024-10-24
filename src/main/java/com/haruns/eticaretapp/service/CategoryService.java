@@ -11,6 +11,7 @@ import com.haruns.eticaretapp.utility.JwtManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -34,5 +35,13 @@ public class CategoryService {
 		}
 		Category category= Category.builder().name(dto.name()).build();
 		categoryRepository.save(category);
+	}
+	
+	public boolean existById(Long id) {
+		return categoryRepository.existsById(id);
+	}
+	
+	public List<String> findNameByIdIn(List<Long> ids) {
+		return categoryRepository.findNameByIdIn(ids);
 	}
 }

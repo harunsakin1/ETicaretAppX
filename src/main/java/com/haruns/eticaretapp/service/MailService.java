@@ -16,7 +16,7 @@ public class MailService {
 	
 	public void sendEmail(String alici,String token){
 		String url="http://localhost:8080/v1/dev/user/verify-account?token="+token;
-		String body="Hesabınızı onaylamak için aşagıdaki linke tıklayınız. "+url;
+		String body="Hesabınızı onaylamak için aşağıdaki linke tıklayınız. "+url;
 		SimpleMailMessage message = new SimpleMailMessage();
 		message.setTo(alici);
 		message.setSubject("Kayıt Onayı");

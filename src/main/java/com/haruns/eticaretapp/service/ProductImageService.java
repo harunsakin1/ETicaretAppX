@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -24,7 +25,6 @@ import java.util.Optional;
 public class ProductImageService {
 	private final ProductImageRepository productImageRepository;
 	private final JwtManager jwtManager;
-	private final ProductService productService;
 	private final UserService userService;
 	private final Cloudinary cloudinary;
 	
@@ -36,9 +36,6 @@ public class ProductImageService {
 		Optional<User> optUser = userService.findById(optUserId.get());
 		if (optUser.isEmpty()) {
 			throw new EticaretException(ErrorType.USER_NOT_FOUND);
-		}
-		if (!productService.existById(dto.productId())){
-			throw new EticaretException(ErrorType.PRODUCT_NOT_FOUND);
 		}
 		if (!optUser.get().getRole().equals(Role.SELLER)) {
 			throw new EticaretException(ErrorType.UNAUTHORIZED);
@@ -54,5 +51,9 @@ public class ProductImageService {
 	public String uploadImage(MultipartFile file) throws IOException {
 		Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
 		return uploadResult.get("url").toString();
+	}
+	
+	public List<String>findUrlByProductIdIn(List<Long> productIds){
+		return productImageRepository.findUrlByProductIdIn(productIds);
 	}
 }

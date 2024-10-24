@@ -1,9 +1,7 @@
 package com.haruns.eticaretapp.entity;
 
 import com.haruns.eticaretapp.entity.enums.State;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -14,9 +12,18 @@ import lombok.experimental.SuperBuilder;
 @Data
 @MappedSuperclass
 public class BaseEntity {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	Long id;
 	@Builder.Default
 	Long createdDate=System.currentTimeMillis();
 	@Builder.Default
-	@Enumerated(EnumType.STRING)
-	State state=State.INACTIVE;
+	Integer state=1;
+	@Builder.Default
+	Long updatedAt= System.currentTimeMillis();
+	
+	@PreUpdate
+	public void preUpdate() {
+		updatedAt=System.currentTimeMillis();
+	}
 }
