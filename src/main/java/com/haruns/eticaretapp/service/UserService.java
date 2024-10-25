@@ -35,32 +35,31 @@ public class UserService {
 	private final JwtManager jwtManager;
 	private final MailService mailService;
 	
-	public Optional<User> findById(Long id){
+	public Optional<User> findById(Long id) {
 		return userRepository.findById(id);
 	}
 	
 	public void register(UserRegisterRequestDto dto)
 			throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException,
 			       InvalidKeyException {
-		User user= UserMapper.INSTANCE.fromRegisterDto(dto);
+		User user = UserMapper.INSTANCE.fromRegisterDto(dto);
 		user.setRole(Role.USER);
 		String encryptedPassword = EncryptionManager.encrypt(dto.password());
 		user.setPassword(encryptedPassword);
 		userRepository.save(user);
-		mailService.sendEmail(user.getEmail(),generateVerificationToken(user.getId()));
+		mailService.sendEmail(user.getEmail(), generateVerificationToken(user.getId()));
 	}
 	
 	
 	public void storeRegister(StoreRegisterRequestDto dto) {
-		User user=UserMapper.INSTANCE.fromStoreRegisterDto(dto);
+		User user = UserMapper.INSTANCE.fromStoreRegisterDto(dto);
 		user.setRole(Role.SELLER);
 		userRepository.save(user);
-		mailService.sendEmail(user.getEmail(),generateVerificationToken(user.getId()));
+		mailService.sendEmail(user.getEmail(), generateVerificationToken(user.getId()));
 	}
 	
 	public String login(LoginRequestDto dto) {
-		Optional<User> optUser =
-				userRepository.findOptionalByEmailAndPassword(dto.email(), dto.password());
+		Optional<User> optUser = userRepository.findOptionalByEmailAndPassword(dto.email(), dto.password());
 		if (optUser.isEmpty()) {
 			throw new EticaretException(ErrorType.INVALID_USERNAME_OR_PASSWORD);
 		}
@@ -85,20 +84,20 @@ public class UserService {
 			throw new EticaretException(ErrorType.USER_NOT_FOUND);
 		}
 		
-		if (optUser.get().getRole().equals(Role.SELLER)){
+		if (optUser.get().getRole().equals(Role.SELLER)) {
 			return UserMapper.INSTANCE.fromUser(optUser.get());
 		}
 		return UserMapper.INSTANCE.fromUserEntity(optUser.get());
 		
 	}
 	
-	public void updateMyProfile(String token,UpdateMyProfileRequestDto dto) {
+	public void updateMyProfile(String token, UpdateMyProfileRequestDto dto) {
 		Optional<Long> optUserId = jwtManager.validateToken(token);
 		if (optUserId.isEmpty()) {
 			throw new EticaretException(ErrorType.INVALID_TOKEN);
 		}
 		Optional<User> optUser = userRepository.findById(optUserId.get());
-		if (optUser.isEmpty()){
+		if (optUser.isEmpty()) {
 			throw new EticaretException(ErrorType.USER_NOT_FOUND);
 		}
 		User user = UserMapper.INSTANCE.fromUpdateMyProfileDto(dto);
@@ -112,20 +111,22 @@ public class UserService {
 			throw new EticaretException(ErrorType.INVALID_TOKEN);
 		}
 		Optional<User> optUser = userRepository.findById(optUserId.get());
-		if (optUser.isEmpty()){
+		if (optUser.isEmpty()) {
 			throw new EticaretException(ErrorType.USER_NOT_FOUND);
 		}
-		User user=UserMapper.INSTANCE.fromUpdateMyStoreProfileDto(dto);
+		User user = UserMapper.INSTANCE.fromUpdateMyStoreProfileDto(dto);
 		user.setId(optUser.get().getId());
 		userRepository.save(user);
 	}
 	
 	public String generateVerificationToken(Long userId) {
-		StringBuilder verificationTokenSB= new StringBuilder();
-		String token= UUID.randomUUID().toString();
-		verificationTokenSB.append(token.substring(0,16));
-		verificationTokenSB.append(System.currentTimeMillis()+(1000*60));
-		VerificationToken verificationToken = new VerificationToken(verificationTokenSB.toString(), userId);
+		StringBuilder verificationTokenSB = new StringBuilder();
+		String token = UUID.randomUUID().toString();
+		verificationTokenSB.append(token.substring(0, 16));
+		verificationTokenSB.append(System.currentTimeMillis() + (1000 * 60));
+		VerificationToken verificationToken =
+				VerificationToken.builder().expDate(System.currentTimeMillis() + (1000 * 60))
+				                 .token(verificationTokenSB.toString()).userId(userId).build();
 		verificationTokenService.save(verificationToken);
 		return verificationTokenSB.toString();
 	}
@@ -133,23 +134,39 @@ public class UserService {
 	public void verifyAccount(String verificationTokenSB) {
 		VerificationToken verificationToken = verificationTokenService.findByToken(verificationTokenSB);
 		
-		if (verificationToken == null) {
+		if (verificationToken == null || verificationToken.getState()== 0) {
 			throw new EticaretException(ErrorType.INVALID_TOKEN);
 		}
-		Long expDate= Long.parseLong(verificationTokenSB.substring(16));
-		if (expDate<System.currentTimeMillis()) {
+		Long expDate = Long.parseLong(verificationTokenSB.substring(16));
+		if (expDate < System.currentTimeMillis()) {
 			throw new EticaretException(ErrorType.EXP_TOKEN_DATE);
 		}
 		Long userId = verificationToken.getUserId();
 		Optional<User> optUser = userRepository.findById(userId);
-		if (optUser.isEmpty()){
+		if (optUser.isEmpty()) {
 			throw new EticaretException(ErrorType.USER_NOT_FOUND);
 		}
 		optUser.get().setStatus(UserStatus.ACTIVE);
+		verificationToken.setState(0);
+		verificationTokenService.save(verificationToken);
 		userRepository.save(optUser.get());
 	}
 	
-	public List<String>findAllStoreNameByIds(List<Long> ids) {
+	public List<String> findAllStoreNameByIds(List<Long> ids) {
 		return userRepository.findAllStoreNameByIds(ids);
+	}
+	public Long sellerTokenControl(String token) {
+		Optional<Long> optUserId = jwtManager.validateToken(token);
+		if (optUserId.isEmpty()) {
+			throw new EticaretException(ErrorType.INVALID_TOKEN);
+		}
+		Optional<User> optUser = findById(optUserId.get());
+		if (optUser.isEmpty()) {
+			throw new EticaretException(ErrorType.USER_NOT_FOUND);
+		}
+		if (!optUser.get().getRole().equals(Role.SELLER)) {
+			throw new EticaretException(ErrorType.UNAUTHORIZED);
+		}
+		return optUserId.get();
 	}
 }

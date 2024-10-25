@@ -9,20 +9,16 @@ spring:
     password: root
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     show-sql: true
   mail:
     host: smtp.gmail.com
     port: 587
-    username: harun16sakin16@gmail.com
+    username: java15mailsender@gmail.com
     password: ${MAIL_PASSWORD}
     properties:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
-  servlet:
-    multipart:
-      max-file-size: 5MB
-      max-request-size: 5MB
 java15:
   jwt:
     secret-key: ${ETICARET_SECRETKEY}
@@ -30,5 +26,5 @@ java15:
 
 cloudinary:
   cloud_name: ${CLOUD_NAME}
-  api_key: ${CLOUD_API_KEY}
-  api_secret: ${CLOUD_API_SECRET}
+  api_key: ${API_KEY}
+  api_secret: ${API_SECRET}

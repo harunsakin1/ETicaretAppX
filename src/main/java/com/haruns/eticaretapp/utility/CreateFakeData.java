@@ -1,9 +1,7 @@
 package com.haruns.eticaretapp.utility;
 
 import com.haruns.eticaretapp.entity.*;
-import com.haruns.eticaretapp.entity.enums.ProductStatus;
-import com.haruns.eticaretapp.entity.enums.Role;
-import com.haruns.eticaretapp.entity.enums.UserStatus;
+import com.haruns.eticaretapp.entity.enums.*;
 import com.haruns.eticaretapp.repository.*;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,11 +13,7 @@ public class CreateFakeData {
 	@Autowired
 	private UserRepository userRepository;
 	@Autowired
-	private ProductRepository productRepository;
-	@Autowired
 	private CategoryRepository categoryRepository;
-	@Autowired
-	private ProductSellerRepository productSellerRepository;
 	@Autowired
 	private ProductImageRepository productImageRepository;
 	private Random rnd=new Random();
@@ -56,30 +50,45 @@ public class CreateFakeData {
 		}
 		
 	}
-	public void createFakeProductData(){
-		for (int i = 0; i < 25; i++) {
-			productRepository.save(Product.builder()
-					                       .name("Product"+i)
-					                       .brand("brand"+i)
-					                       .status(ProductStatus.ACCEPTED)
-					                       .description("Description"+i)
-					                       .categoryId(rnd.nextLong(1,5))
-					                       .code("code"+i)
-					                       .totalRating(rnd.nextDouble(1,5))
-			                              .build());
-		}
-		
-	}
-	public void createFakeProductSellerData(){
-		for (long i = 1; i <= 25; i++) {
-			productSellerRepository.save(ProductSeller.builder()
-					                             .productId(i)
-					                             .price(rnd.nextDouble(1,1000))
-					                             .stock(rnd.nextInt(1,100))
-					                             .userId(rnd.nextLong(5,10))
-			                                          .build());
-		}
-	}
+//	public void createFakeProductData(){
+//		for (int i = 0; i < 10; i++) {
+//			productRepository.save(ComputerProduct.builder()
+//					                       .name("Computer"+i)
+//			                                       .brand("brand"+i)
+//			                                       .status(ProductStatus.ACCEPTED)
+//			                                       .description("Description"+i)
+//			                                       .categoryId(rnd.nextLong(1,5))
+//			                                       .code("code"+i)
+//			                                       .totalRating(rnd.nextDouble(1,5))
+//					                       .cpu(ComputerCPU.i3)
+//					                       .gpu(ComputerGPU.GTX1XXX)
+//					                       .screenSize(ComputerScreenSize.INCH_15)
+//			                                      .build());
+//
+//		}
+//		for (int i = 0; i < 10; i++) {
+//			productRepository.save(Product.builder()
+//			                              .name("Product"+i)
+//			                              .brand("brand"+i)
+//			                              .status(ProductStatus.ACCEPTED)
+//			                              .description("Description"+i)
+//			                              .categoryId(rnd.nextLong(1,5))
+//			                              .code("code"+i)
+//			                              .totalRating(rnd.nextDouble(1,5))
+//			                              .build());
+//		}
+//
+//	}
+//	public void createFakeProductSellerData(){
+//		for (long i = 1; i <= 25; i++) {
+//			productSellerRepository.save(ProductSeller.builder()
+//					                             .productId(i)
+//					                             .price(rnd.nextDouble(1,1000))
+//					                             .stock(rnd.nextInt(1,100))
+//					                             .userId(rnd.nextLong(5,10))
+//			                                          .build());
+//		}
+//	}
 	
 	public void createFakeUrlData(){
 		for (long i = 1; i <= 25; i++) {
@@ -90,13 +99,12 @@ public class CreateFakeData {
 		}
 		
 	}
-	@PostConstruct
+	//@PostConstruct
 	public void createFakeData(){
 		createFakeUserData();
 		createFakeCategoryData();
-		createFakeProductData();
+	//	createFakeProductData();
 		createFakeUrlData();
-		createFakeProductSellerData();
 	}
 	
 	

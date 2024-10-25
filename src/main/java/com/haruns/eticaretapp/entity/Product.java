@@ -11,12 +11,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @Data
-@Entity
-@Table(name = "tblproduct")
-public class Product extends BaseEntity {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
+@MappedSuperclass
+public abstract class Product extends BaseEntity {
 	Long categoryId;
 	String name;
 	String code;
@@ -25,4 +21,7 @@ public class Product extends BaseEntity {
 	Double totalRating;
 	@Enumerated(EnumType.STRING)
 	ProductStatus status;
+	Long sellerId;
+	Long stock;
+	Double price;
 }

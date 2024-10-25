@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -12,10 +13,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Entity
 @Table(name = "tblverificationtoken")
-public class VerificationToken {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
+public class VerificationToken extends BaseEntity  {
 	String token;
 	Long userId;
 	Long expDate;

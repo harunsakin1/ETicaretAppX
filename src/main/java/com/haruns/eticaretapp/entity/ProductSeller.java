@@ -9,12 +9,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @Data
-@Entity
-@Table(name = "tblproduct_seller")
 public class ProductSeller extends BaseEntity {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
 	Long userId;
 	Long productId;
 	Integer stock;

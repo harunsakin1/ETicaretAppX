@@ -1,18 +1,12 @@
 package com.haruns.eticaretapp.controller;
 
 import com.haruns.eticaretapp.dto.request.AddProductRequestDto;
-import com.haruns.eticaretapp.dto.request.UpdateProductRequestDto;
 import com.haruns.eticaretapp.dto.response.BaseResponse;
-import com.haruns.eticaretapp.entity.Product;
 import com.haruns.eticaretapp.service.ProductService;
-import com.haruns.eticaretapp.view.VwProduct;
-import com.haruns.eticaretapp.view.VwProductDisplay;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 import static com.haruns.eticaretapp.constant.RestApis.*;
 
@@ -34,48 +28,48 @@ public class ProductController {
 		                                     .build());
 	}
 	
-	@GetMapping(GET_PENDING_PRODUCTS)
-	public ResponseEntity<BaseResponse<List<Product>>> getPendingProducts(String token){
-		return ResponseEntity.ok(BaseResponse.<List<Product>>builder()
-				                         .code(200)
-				                         .success(true)
-				                         .data(productService.getPendingProducts(token))
-				                         .message("Pending ürünler getirildi.")
-		                                     .build());
-	}
+//	@GetMapping(GET_PENDING_PRODUCTS)
+//	public ResponseEntity<BaseResponse<List<Product>>> getPendingProducts(String token){
+//		return ResponseEntity.ok(BaseResponse.<List<Product>>builder()
+//				                         .code(200)
+//				                         .success(true)
+//				                         .data(productService.getPendingProducts(token))
+//				                         .message("Pending ürünler getirildi.")
+//		                                     .build());
+//	}
 	
-	@PatchMapping(CONFIRM_PRODUCT_STATUS)
-	public ResponseEntity<BaseResponse<Boolean>> confirmProductStatus(String token, Long productId){
-		productService.confirmProductStatus(token, productId);
-		return ResponseEntity.ok(BaseResponse.<Boolean>builder()
-		                                     .message("Ürün durumu güncellendi.")
-		                                     .code(200)
-		                                     .data(true)
-		                                     .success(true)
-		                                     .build());
-	}
+//	@PatchMapping(CONFIRM_PRODUCT_STATUS)
+//	public ResponseEntity<BaseResponse<Boolean>> confirmProductStatus(String token, Long productId){
+//		productService.confirmProductStatus(token, productId);
+//		return ResponseEntity.ok(BaseResponse.<Boolean>builder()
+//		                                     .message("Ürün durumu güncellendi.")
+//		                                     .code(200)
+//		                                     .data(true)
+//		                                     .success(true)
+//		                                     .build());
+//	}
 	
-	@PutMapping(UPDATE_PRODUCT)
-	public ResponseEntity<BaseResponse<Boolean>> updateProduct(String token, @RequestBody @Valid UpdateProductRequestDto dto){
-		productService.updateProduct(token, dto);
-		return ResponseEntity.ok(BaseResponse.<Boolean>builder()
-				                         .code(200)
-				                         .message("Ürün başarıyla güncellendi.")
-				                         .data(true)
-				                         .success(true)
-		                                     .build());
-	}
+//	@PutMapping(UPDATE_PRODUCT)
+//	public ResponseEntity<BaseResponse<Boolean>> updateProduct(String token, @RequestBody @Valid UpdateProductRequestDto dto){
+//		productService.updateProduct(token, dto);
+//		return ResponseEntity.ok(BaseResponse.<Boolean>builder()
+//				                         .code(200)
+//				                         .message("Ürün başarıyla güncellendi.")
+//				                         .data(true)
+//				                         .success(true)
+//		                                     .build());
+//	}
 	
-	@DeleteMapping(DELETE_PRODUCT)
-	public ResponseEntity<BaseResponse<Boolean>> deleteProduct(String token,Long productId){
-		productService.deleteProduct(token,productId);
-		return ResponseEntity.ok(BaseResponse.<Boolean>builder()
-				                         .code(200)
-				                         .message("Ürün başarıyla silindi.")
-				                         .data(true)
-				                         .success(true)
-		                                     .build());
-	}
+//	@DeleteMapping(DELETE_PRODUCT)
+//	public ResponseEntity<BaseResponse<Boolean>> deleteProduct(String token,Long productId){
+//		productService.deleteProduct(token,productId);
+//		return ResponseEntity.ok(BaseResponse.<Boolean>builder()
+//				                         .code(200)
+//				                         .message("Ürün başarıyla silindi.")
+//				                         .data(true)
+//				                         .success(true)
+//		                                     .build());
+//	}
 	
 //	@GetMapping(GET_CONFIRMED_PRODUCTS)
 //	public ResponseEntity<BaseResponse<List<VwProductDisplay>>> getAllConfirmedProducts(){
