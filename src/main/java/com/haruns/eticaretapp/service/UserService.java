@@ -198,4 +198,49 @@ public class UserService {
 		}
 		return true;
 	}
+	
+	
+	public void forgotPassword(ForgotPasswordRequestDto dto) {
+		Optional<User> optUser = userRepository.findOptionalByEmail(dto.email());
+		if (optUser.isEmpty()) {
+			throw new EticaretException(ErrorType.USER_NOT_FOUND);
+		}
+		
+		
+		String token = generateVerificationToken(optUser.get().getId());
+		
+		
+		mailService.sendResetPasswordEmail(dto.email(), token);
+	}
+	
+	public void resetPassword(UpdatePasswordRequestDto dto, String token)
+			throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException,
+			       InvalidKeyException {
+		VerificationToken verificationToken = verificationTokenService.findByToken(token);
+		
+		if (verificationToken == null || verificationToken.getState() == 0) {
+			throw new EticaretException(ErrorType.INVALID_TOKEN);
+		}
+		
+		Long expDate = Long.parseLong(token.substring(16));
+		if (expDate < System.currentTimeMillis()) {
+			throw new EticaretException(ErrorType.EXP_TOKEN_DATE);
+		}
+		
+		String userId = verificationToken.getUserId();
+		Optional<User> optUser = userRepository.findById(userId);
+		if (optUser.isEmpty()) {
+			throw new EticaretException(ErrorType.USER_NOT_FOUND);
+		}
+		
+		String encryptedPassword = EncryptionManager.encrypt(dto.newPassword());
+		User user = optUser.get();
+		user.setPassword(encryptedPassword);
+		
+		verificationToken.setState(0);
+		verificationTokenService.save(verificationToken);
+		userRepository.save(user);
+	}
+	
+	
 }

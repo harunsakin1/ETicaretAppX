@@ -22,4 +22,7 @@ public interface UserRepository extends JpaRepository<User,String> {
 	
 	@Query("SELECT u.storeName FROM User u WHERE u.id =?1")
 	String findStoreNameById(String userId);
+	
+	
+	Optional<User> findOptionalByEmail(String email);
 }

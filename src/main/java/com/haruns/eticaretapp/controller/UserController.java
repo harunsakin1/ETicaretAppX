@@ -52,6 +52,7 @@ public class UserController {
 				                         .success(true)
 				                         .build());
 	}
+	
 	@PostMapping(LOGIN)
 	public ResponseEntity<BaseResponse<String>> doLogin(@RequestBody @Valid LoginRequestDto dto)
 			throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException,
@@ -109,6 +110,34 @@ public class UserController {
 		return ResponseEntity.ok(BaseResponse.<Boolean>builder()
 		                                     .code(200)
 		                                     .message("Güncelleme işlemi başarıyla tamamlandı.")
+		                                     .data(true)
+		                                     .success(true)
+		                                     .build());
+	}
+	
+	@PostMapping(FORGOT_PASSWORD)
+	public ResponseEntity<BaseResponse<Boolean>> forgotPassword(@RequestBody ForgotPasswordRequestDto dto) {
+		userService.forgotPassword(dto);
+		return ResponseEntity.ok(BaseResponse.<Boolean>builder()
+		                                     .code(200)
+		                                     .message("Sıfırlama kodu gönderildi.")
+		                                     .data(true)
+		                                     .success(true)
+		                                     .build());
+	}
+	
+	
+	
+	@PostMapping(RESET_PASSWORD)
+	public ResponseEntity<BaseResponse<Boolean>> updatePassword(@RequestBody @Valid UpdatePasswordRequestDto dto,
+	                                                            @RequestParam(
+			"token") String token)
+			throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException,
+			       InvalidKeyException {
+		userService.resetPassword(dto,token);
+		return ResponseEntity.ok(BaseResponse.<Boolean>builder()
+		                                     .code(200)
+		                                     .message("Şifre başarıyla güncellendi.")
 		                                     .data(true)
 		                                     .success(true)
 		                                     .build());

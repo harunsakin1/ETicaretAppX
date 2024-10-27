@@ -35,6 +35,8 @@ public class RestApis {
 	public static final String GET_CART="/get-cart";
 	public static final String CLEAR_CART="/clear-cart";
 	public static final String FILTER_PRODUCTS="/filter-products";
+	public static final String FORGOT_PASSWORD="/forgot-password";
+	public static final String RESET_PASSWORD="/reset-password";
 	
 	
 	

@@ -23,6 +23,7 @@ public class Basket extends BaseEntity {
 	
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "basket_id")
+	@Builder.Default
 	private List<BasketItem> basketItems = new ArrayList<>();
 	
 	public void addItem(BasketItem item) {

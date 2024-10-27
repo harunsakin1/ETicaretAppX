@@ -31,6 +31,7 @@ public class SaleService {
 	private final AddressService addressService;
 	private final SaleItemRepository saleItemRepository;
 	
+	
 	public void saveSale(SaleDto saleDto) {
 		String token = saleDto.getToken();
 		Optional<String> optUserId = jwtManager.validateToken(token);
@@ -68,6 +69,6 @@ public class SaleService {
 			sale.setTotalPrice(totalPrice);
 			basketService.clearBasket(usersBasket.getUserId());
 			saleRepository.save(sale);
-            
+			
 		}
 }

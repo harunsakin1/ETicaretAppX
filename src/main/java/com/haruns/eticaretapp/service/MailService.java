@@ -24,4 +24,17 @@ public class MailService {
 		message.setText(body);
 		mailSender.send(message);
 	}
+	
+	public String sendResetPasswordEmail(String email, String token) {
+		String url = "http://localhost:8080/v1/dev/user/reset-password?token=" + token;
+		String body = "Parolanızı yenilemek için aşağıdaki linke tıklayınız:\n" + url;
+		
+		SimpleMailMessage message = new SimpleMailMessage();
+		message.setTo(email);
+		message.setSubject("Parola Yenileme");
+		message.setText(body);
+		mailSender.send(message);
+		
+		return token;
+	}
 }
