@@ -3,24 +3,24 @@ package com.haruns.eticaretapp.service;
 import com.haruns.eticaretapp.dto.request.AddProductRequestDto;
 import com.haruns.eticaretapp.dto.request.ProductFilterDto;
 import com.haruns.eticaretapp.dto.request.UpdateProductRequestDto;
-import com.haruns.eticaretapp.entity.ClothingProduct;
-import com.haruns.eticaretapp.entity.ComputerProduct;
-import com.haruns.eticaretapp.entity.PhoneProduct;
-import com.haruns.eticaretapp.entity.Product;
+import com.haruns.eticaretapp.entity.*;
 import com.haruns.eticaretapp.entity.enums.ProductStatus;
 import com.haruns.eticaretapp.exception.ErrorType;
 import com.haruns.eticaretapp.exception.EticaretException;
-import com.haruns.eticaretapp.repository.PhoneProductRepository;
+import com.haruns.eticaretapp.repository.*;
 
 import com.haruns.eticaretapp.utility.EntityIdOperator;
 import com.haruns.eticaretapp.utility.ProductCodeGenerator;
 import com.haruns.eticaretapp.utility.ProductSpecification;
+import com.haruns.eticaretapp.view.VwProduct;
+import com.haruns.eticaretapp.view.VwProductDisplay;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +29,10 @@ public class PhoneProductService implements MergedService<PhoneProduct>{
 	private final ProductCodeGenerator productCodeGenerator;
 	private final EntityIdOperator entityIdOperator;
 	private final ProductSpecification<PhoneProduct> productSpecification;
+	private final UserRepository userRepository;
+	private final CategoryRepository categoryRepository;
+	private final ProductImageRepository productImageRepository;
+	private final ProductCommentRepository productCommentRepository;
 	
 	@Override
 	public void addProduct(AddProductRequestDto dto, String sellerId) {
@@ -98,5 +102,45 @@ public class PhoneProductService implements MergedService<PhoneProduct>{
 	public List<PhoneProduct> filterProducts(ProductFilterDto filterDto){
 		Specification<PhoneProduct> specification = productSpecification.getProductsByFilter(filterDto);
 		return phoneProductRepository.findAll(specification);
+	}
+	
+	@Override
+	public List<VwProduct> getTop10ByStatus(){
+		LinkedList<VwProductDisplay> neededFields = phoneProductRepository.getNeededFields(Pageable.ofSize(10));
+		Map<String,String> storeIdNames = new HashMap<>();
+		for (VwProductDisplay vwProduct : neededFields) {
+            storeIdNames.put(vwProduct.getSellerId(),
+                             userRepository.findStoreNameById(vwProduct.getSellerId()));
+        }
+		Map<String,String> categoryIdNames = new HashMap<>();
+		for (VwProductDisplay vwProduct : neededFields) {
+            categoryIdNames.put(vwProduct.getCategoryId(),
+                    categoryRepository.findNameById(vwProduct.getCategoryId()));
+        }
+		
+		Map<String,List<String>> productIdUrls=new HashMap<>();
+		for (VwProductDisplay vwProduct : neededFields) {
+            productIdUrls.put(vwProduct.getId(), productImageRepository.findUrlByProductId(vwProduct.getId()));
+        }
+		Map<String,List<ProductComment>> productIdComments=new HashMap<>();
+		for (VwProductDisplay vwProduct : neededFields) {
+			productIdComments.put(vwProduct.getId(), productCommentRepository.findCommentsByProductId(vwProduct.getId()));
+		}
+		List<VwProduct> phoneProductViews = new ArrayList<>();
+		for (VwProductDisplay vwProductDisplay : neededFields) {
+			VwProduct vwProduct = VwProduct.builder()
+					.productDisplay(vwProductDisplay)
+					.storeName(storeIdNames.get(vwProductDisplay.getSellerId()))
+					.categoryName(categoryIdNames.get(vwProductDisplay.getCategoryId()))
+					.productUrls(productIdUrls.get(vwProductDisplay.getId()))
+					.commentList(productIdComments.get(vwProductDisplay.getId()))
+					.phoneCpu(phoneProductRepository.findCpuById(vwProductDisplay.getId()))
+					.phoneCamera(phoneProductRepository.findCameraById(vwProductDisplay.getId()))
+					.phoneScreen(phoneProductRepository.findScreenById(vwProductDisplay.getId()))
+					.phoneStorage(phoneProductRepository.findStorageById(vwProductDisplay.getId()))
+					.build();
+			phoneProductViews.add(vwProduct);
+		}
+		return phoneProductViews;
 	}
 }

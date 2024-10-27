@@ -13,4 +13,7 @@ public interface CategoryRepository extends JpaRepository<Category,String> {
 	
 	@Query("SELECT c.id FROM Category c")
 	List<String> findAllIds();
+	
+	@Query("SELECT c.name FROM Category c WHERE c.id =?1")
+	String findNameById(String categoryId);
 }

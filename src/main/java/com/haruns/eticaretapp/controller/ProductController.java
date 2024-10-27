@@ -8,6 +8,8 @@ import com.haruns.eticaretapp.entity.Product;
 import com.haruns.eticaretapp.entity.enums.ProductType;
 import com.haruns.eticaretapp.service.ProductService;
 import com.haruns.eticaretapp.service.UserService;
+import com.haruns.eticaretapp.view.VwProduct;
+import com.haruns.eticaretapp.view.VwProductDisplay;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -89,14 +91,14 @@ public class ProductController {
                                              .build());
 	}
 	
-//	@GetMapping(GET_CONFIRMED_PRODUCTS)
-//	public ResponseEntity<BaseResponse<List<VwProductDisplay>>> getAllConfirmedProducts(){
-//		return ResponseEntity.ok(BaseResponse.<List<VwProductDisplay>>builder()
-//				                         .code(200)
-//				                         .message("Tüm confirmed ürünler getirildi.")
-//				                         .success(true)
-//				                         .data(productService.getAllConfirmedProducts())
-//		                                     .build());
-//
-//	}
+	@GetMapping(GET_CONFIRMED_PRODUCTS)
+	public ResponseEntity<BaseResponse<List<VwProduct>>> getAllConfirmedProducts(@RequestParam ProductType productType){
+		return ResponseEntity.ok(BaseResponse.<List<VwProduct>>builder()
+				                         .code(200)
+				                         .message("Tüm confirmed ürünler getirildi.")
+				                         .success(true)
+				                         .data(productService.getAllConfirmedProducts(productType))
+				                         .build());
+
+	}
 }

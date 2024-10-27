@@ -13,6 +13,7 @@ import com.haruns.eticaretapp.repository.ClothingProductRepository;
 import com.haruns.eticaretapp.utility.EntityIdOperator;
 import com.haruns.eticaretapp.utility.ProductCodeGenerator;
 import com.haruns.eticaretapp.utility.ProductSpecification;
+import com.haruns.eticaretapp.view.VwProduct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -91,5 +92,10 @@ public class ClothingProductService implements MergedService<ClothingProduct>{
 	public List<ClothingProduct> filterProducts(ProductFilterDto filterDto){
 		Specification<ClothingProduct> specification = productSpecification.getProductsByFilter(filterDto);
 		return clothingProductRepository.findAll(specification);
+	}
+	
+	@Override
+	public List<VwProduct> getTop10ByStatus() {
+		return List.of();
 	}
 }

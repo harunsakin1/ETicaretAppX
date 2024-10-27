@@ -13,7 +13,12 @@ import com.haruns.eticaretapp.mapper.ProductMapper;
 import com.haruns.eticaretapp.utility.EntityIdOperator;
 import com.haruns.eticaretapp.utility.JwtManager;
 import com.haruns.eticaretapp.utility.ProductServiceMapper;
+import com.haruns.eticaretapp.view.VwProduct;
+import com.haruns.eticaretapp.view.VwProductDisplay;
+import com.haruns.eticaretapp.view.VwProductSeller;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -105,35 +111,7 @@ public class ProductService {
 		productServiceMapper.getService(entityIdOperator.extractProductTypeFromProductId(productId)).deleteById(productId);
 	}
 	
-//	public List<VwProductDisplay> getAllConfirmedProducts() {
-//		Pageable pageable= PageRequest.of(0, 20);
-//		List<VwProduct> productList = productRepository.getNeededFields(pageable);
-//		List<Long> productIds=new ArrayList<>();
-//		productList.forEach(p->{
-//			productIds.add(p.getId());
-//		});
-//		List<VwProductSeller> productSellerList = productSellerService.getNeededFields(pageable, productIds);
-//		List<Long>userIds=new ArrayList<>();
-//		productSellerList.forEach(u->{
-//			userIds.add(u.getUserId());
-//		                          });
-//		List<String> allStoreName = userService.findAllStoreNameByIds(userIds);
-//		List<String> allCategoryName = categoryService.findNameByIdIn(productList.stream().map
-//		(VwProduct::getCategoryId)
-//		                                                                    .collect(Collectors.toList()));
-//		List<String> allUrls =
-//				productImageService.findUrlByProductIdIn(productList.stream().map(VwProduct::getId)
-//				                                                    .collect(Collectors.toList()));
-//		List<VwProductDisplay> allProductFields=new ArrayList<>();
-//		for (int i = 0; i < 20; i++) {
-//			allProductFields.add(VwProductDisplay.builder()
-//					                     .vwProduct(productList.get(i))
-//					                     .storeName(allStoreName.get())
-//					                     .price(productSellerList.get(i).getPrice())
-//					                     .url(allUrls.get(i))
-//					                     .categoryName(allCategoryName.get())
-//			                                     .build());
-//		}
-//		return allProductFields;
-//	}
+	public List<VwProduct> getAllConfirmedProducts(ProductType productType) {
+		return productServiceMapper.getService(productType.name().toLowerCase()).getTop10ByStatus();
+	}
 }

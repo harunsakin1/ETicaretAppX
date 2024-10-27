@@ -10,4 +10,7 @@ public interface ProductImageRepository extends JpaRepository<ProductImage,Strin
 	
 	@Query("SELECT p.url FROM ProductImage p WHERE p.productId IN (?1)")
 	List<String> findUrlByProductIdIn(List<String> productIds);
+	
+	@Query("SELECT p.url FROM ProductImage p WHERE p.productId =?1")
+	List<String> findUrlByProductId(String productId);
 }
