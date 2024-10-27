@@ -13,6 +13,7 @@ import com.haruns.eticaretapp.exception.EticaretException;
 import com.haruns.eticaretapp.mapper.UserMapper;
 import com.haruns.eticaretapp.repository.UserRepository;
 import com.haruns.eticaretapp.utility.EncryptionManager;
+import com.haruns.eticaretapp.utility.EntityIdOperator;
 import com.haruns.eticaretapp.utility.JwtManager;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -34,8 +35,9 @@ public class UserService {
 	private final VerificationTokenService verificationTokenService;
 	private final JwtManager jwtManager;
 	private final MailService mailService;
+	private final EntityIdOperator entityIdOperator;
 	
-	public Optional<User> findById(Long id) {
+	public Optional<User> findById(String id) {
 		return userRepository.findById(id);
 	}
 	
@@ -43,7 +45,8 @@ public class UserService {
 			throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException,
 			       InvalidKeyException {
 		User user = UserMapper.INSTANCE.fromRegisterDto(dto);
-		user.setRole(Role.USER);
+		user.setId(entityIdOperator.generateUniqueIdForOtherEntities());
+		user.setRole(Role.ADMIN);
 		String encryptedPassword = EncryptionManager.encrypt(dto.password());
 		user.setPassword(encryptedPassword);
 		userRepository.save(user);
@@ -51,15 +54,24 @@ public class UserService {
 	}
 	
 	
-	public void storeRegister(StoreRegisterRequestDto dto) {
+	public void storeRegister(StoreRegisterRequestDto dto)
+			throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException,
+			       InvalidKeyException {
 		User user = UserMapper.INSTANCE.fromStoreRegisterDto(dto);
 		user.setRole(Role.SELLER);
+		user.setId(entityIdOperator.generateUniqueIdForOtherEntities());
+		String encryptedPassword = EncryptionManager.encrypt(dto.password());
+		user.setPassword(encryptedPassword);
 		userRepository.save(user);
 		mailService.sendEmail(user.getEmail(), generateVerificationToken(user.getId()));
 	}
 	
-	public String login(LoginRequestDto dto) {
-		Optional<User> optUser = userRepository.findOptionalByEmailAndPassword(dto.email(), dto.password());
+	public String login(LoginRequestDto dto)
+			throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException,
+			       InvalidKeyException {
+		System.out.println(dto.email()+"  "+dto.password());
+		String encryptedPassword = EncryptionManager.encrypt(dto.password());
+		Optional<User> optUser = userRepository.findByPasswordAndEmail(dto.email(), encryptedPassword);
 		if (optUser.isEmpty()) {
 			throw new EticaretException(ErrorType.INVALID_USERNAME_OR_PASSWORD);
 		}
@@ -75,7 +87,7 @@ public class UserService {
 	
 	
 	public IMyProfile getMyProfile(String token) {
-		Optional<Long> optUserId = jwtManager.validateToken(token);
+		Optional<String> optUserId = jwtManager.validateToken(token);
 		if (optUserId.isEmpty()) {
 			throw new EticaretException(ErrorType.INVALID_TOKEN);
 		}
@@ -92,7 +104,7 @@ public class UserService {
 	}
 	
 	public void updateMyProfile(String token, UpdateMyProfileRequestDto dto) {
-		Optional<Long> optUserId = jwtManager.validateToken(token);
+		Optional<String> optUserId = jwtManager.validateToken(token);
 		if (optUserId.isEmpty()) {
 			throw new EticaretException(ErrorType.INVALID_TOKEN);
 		}
@@ -106,7 +118,7 @@ public class UserService {
 	}
 	
 	public void updateMyStoreProfile(String token, UpdateMyStoreProfileRequestDto dto) {
-		Optional<Long> optUserId = jwtManager.validateToken(token);
+		Optional<String> optUserId = jwtManager.validateToken(token);
 		if (optUserId.isEmpty()) {
 			throw new EticaretException(ErrorType.INVALID_TOKEN);
 		}
@@ -119,13 +131,15 @@ public class UserService {
 		userRepository.save(user);
 	}
 	
-	public String generateVerificationToken(Long userId) {
+	public String generateVerificationToken(String userId) {
 		StringBuilder verificationTokenSB = new StringBuilder();
 		String token = UUID.randomUUID().toString();
 		verificationTokenSB.append(token.substring(0, 16));
 		verificationTokenSB.append(System.currentTimeMillis() + (1000 * 60));
 		VerificationToken verificationToken =
-				VerificationToken.builder().expDate(System.currentTimeMillis() + (1000 * 60))
+				VerificationToken.builder()
+						.id(entityIdOperator.generateUniqueIdForOtherEntities())
+				                 .expDate(System.currentTimeMillis() + (1000 * 60))
 				                 .token(verificationTokenSB.toString()).userId(userId).build();
 		verificationTokenService.save(verificationToken);
 		return verificationTokenSB.toString();
@@ -141,7 +155,7 @@ public class UserService {
 		if (expDate < System.currentTimeMillis()) {
 			throw new EticaretException(ErrorType.EXP_TOKEN_DATE);
 		}
-		Long userId = verificationToken.getUserId();
+		String userId = verificationToken.getUserId();
 		Optional<User> optUser = userRepository.findById(userId);
 		if (optUser.isEmpty()) {
 			throw new EticaretException(ErrorType.USER_NOT_FOUND);
@@ -152,11 +166,11 @@ public class UserService {
 		userRepository.save(optUser.get());
 	}
 	
-	public List<String> findAllStoreNameByIds(List<Long> ids) {
+	public List<String> findAllStoreNameByIds(List<String> ids) {
 		return userRepository.findAllStoreNameByIds(ids);
 	}
-	public Long sellerTokenControl(String token) {
-		Optional<Long> optUserId = jwtManager.validateToken(token);
+	public Boolean sellerTokenControl(String token) {
+		Optional<String> optUserId = jwtManager.validateToken(token);
 		if (optUserId.isEmpty()) {
 			throw new EticaretException(ErrorType.INVALID_TOKEN);
 		}
@@ -167,6 +181,21 @@ public class UserService {
 		if (!optUser.get().getRole().equals(Role.SELLER)) {
 			throw new EticaretException(ErrorType.UNAUTHORIZED);
 		}
-		return optUserId.get();
+		return true;
+	}
+	
+	public Boolean adminTokenControl(String token) {
+		Optional<String> optUserId = jwtManager.validateToken(token);
+		if (optUserId.isEmpty()) {
+			throw new EticaretException(ErrorType.INVALID_TOKEN);
+		}
+		Optional<User> optUser = findById(optUserId.get());
+		if (optUser.isEmpty()) {
+			throw new EticaretException(ErrorType.USER_NOT_FOUND);
+		}
+		if (!optUser.get().getRole().equals(Role.ADMIN)) {
+			throw new EticaretException(ErrorType.UNAUTHORIZED);
+		}
+		return true;
 	}
 }

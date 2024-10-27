@@ -12,11 +12,9 @@ import lombok.experimental.SuperBuilder;
 @Entity
 @Table(name = "tblproduct_comment")
 public class ProductComment extends BaseEntity {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
-	Long userId;
-	Long productId;
+	
+	String userId;
+	String productId;
 	String comment;
 	Integer rating;
 }

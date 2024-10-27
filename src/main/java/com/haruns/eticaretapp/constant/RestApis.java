@@ -30,6 +30,10 @@ public class RestApis {
 	public static final String GET_PENDING_PRODUCTS="/get-pending-products";
 	public static final String GET_CONFIRMED_PRODUCTS="/get-confirmed-products";
 	public static final String VERIFY_ACCOUNT="/verify-account";
+	public static final String ADD_TO_CART="/add-to-cart";
+	public static final String REMOVE_FROM_CART="/remove-from-cart";
+	public static final String GET_CART="/get-cart";
+	public static final String CLEAR_CART="/clear-cart";
 	
 	
 	

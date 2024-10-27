@@ -18,7 +18,8 @@ public enum ErrorType {
 	CATEGORY_NOT_FOUND(5001,"Kategori bulunamadı.",HttpStatus.NOT_FOUND),
 	UNAUTHORIZED(6005,"Yetkiniz bulunmamaktadır.",HttpStatus.UNAUTHORIZED),
 	EXP_TOKEN_DATE(8001,"Token'in geçerlilik tarihi geçmiştir.",HttpStatus.BAD_REQUEST),
-	MISSING_FIELDS(7004,"Sectiginiz kategori icin gerekli alanlar eksik.", HttpStatus.BAD_REQUEST);
+	MISSING_FIELDS(7004,"Sectiginiz kategori icin gerekli alanlar eksik.", HttpStatus.BAD_REQUEST),
+	PRODUCT_NOT_FOUND_IN_BASKET(7005,"Sepette böyle bir ürün bulunamadı.", HttpStatus.NOT_FOUND);
 	
 	
 	

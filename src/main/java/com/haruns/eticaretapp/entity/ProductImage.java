@@ -12,9 +12,7 @@ import lombok.experimental.SuperBuilder;
 @Entity
 @Table(name = "tblproduct_image")
 public class ProductImage extends BaseEntity {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
-	Long productId;
+	
+	String productId;
 	String url;
 }

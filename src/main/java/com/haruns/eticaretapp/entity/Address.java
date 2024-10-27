@@ -12,10 +12,7 @@ import lombok.experimental.SuperBuilder;
 @Entity
 @Table(name = "tbladdress")
 public class Address extends BaseEntity{
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
-	Long userId;
+	String userId;
 	String title;
 	String city;
 	String district;

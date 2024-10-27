@@ -9,6 +9,7 @@ import com.haruns.eticaretapp.entity.enums.Role;
 import com.haruns.eticaretapp.exception.ErrorType;
 import com.haruns.eticaretapp.exception.EticaretException;
 import com.haruns.eticaretapp.repository.ProductImageRepository;
+import com.haruns.eticaretapp.utility.EntityIdOperator;
 import com.haruns.eticaretapp.utility.JwtManager;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,9 +28,10 @@ public class ProductImageService {
 	private final JwtManager jwtManager;
 	private final UserService userService;
 	private final Cloudinary cloudinary;
+	private final EntityIdOperator entityIdOperator;
 	
-	public void addImageToProduct(String token, AddImageToProductRequestDto dto,MultipartFile file) throws IOException {
-		Optional<Long> optUserId = jwtManager.validateToken(token);
+	public void addImageToProduct(AddImageToProductRequestDto dto,MultipartFile file) throws IOException {
+		Optional<String> optUserId = jwtManager.validateToken(dto.token());
 		if (optUserId.isEmpty()) {
 			throw new EticaretException(ErrorType.INVALID_TOKEN);
 		}
@@ -42,6 +44,7 @@ public class ProductImageService {
 		}
 		
 		ProductImage productImage= ProductImage.builder()
+				.id(entityIdOperator.generateUniqueIdForOtherEntities())
 		                                        .productId(dto.productId())
 												.url(uploadImage(file))
 		                                        .build();
@@ -53,7 +56,7 @@ public class ProductImageService {
 		return uploadResult.get("url").toString();
 	}
 	
-	public List<String>findUrlByProductIdIn(List<Long> productIds){
+	public List<String>findUrlByProductIdIn(List<String> productIds){
 		return productImageRepository.findUrlByProductIdIn(productIds);
 	}
 }

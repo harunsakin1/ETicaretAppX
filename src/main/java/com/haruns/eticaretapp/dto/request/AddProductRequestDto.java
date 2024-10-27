@@ -22,7 +22,9 @@ public class AddProductRequestDto {
 	@NotNull
 	public Long stock;
 	@NotNull
-	public Long categoryId;
+	public String categoryId;
+	@NotNull
+	public ProductType productType;
 	public ComputerRam computerRam;
 	public ComputerGPU computerGPU;
 	public ComputerCPU computerCPU;

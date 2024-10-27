@@ -1,19 +1,22 @@
 package com.haruns.eticaretapp.service;
 
 import com.haruns.eticaretapp.dto.request.AddProductRequestDto;
+import com.haruns.eticaretapp.dto.request.UpdateProductRequestDto;
 import com.haruns.eticaretapp.entity.*;
 import com.haruns.eticaretapp.entity.enums.ProductStatus;
+import com.haruns.eticaretapp.entity.enums.ProductType;
 import com.haruns.eticaretapp.entity.enums.Role;
 import com.haruns.eticaretapp.exception.ErrorType;
 import com.haruns.eticaretapp.exception.EticaretException;
-import com.haruns.eticaretapp.repository.ClothingRepository;
-import com.haruns.eticaretapp.repository.ComputerProductRepository;
-import com.haruns.eticaretapp.repository.UserRepository;
+import com.haruns.eticaretapp.mapper.ProductMapper;
+import com.haruns.eticaretapp.utility.EntityIdOperator;
 import com.haruns.eticaretapp.utility.JwtManager;
-import com.haruns.eticaretapp.utility.ProductCodeGenerator;
+import com.haruns.eticaretapp.utility.ProductServiceMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -21,88 +24,77 @@ import java.util.Random;
 @Service
 @RequiredArgsConstructor
 public class ProductService {
-	private final ComputerProductService computerProductService;
-	private final ClothingProductService clothingProductService;
-	private final PhoneProductService phoneProductService;
+	private final List<MergedService<? extends Product>> productServices;
 	private final UserService userService;
 	private final JwtManager jwtManager;
 	private final CategoryService categoryService;
-	private final ProductImageService productImageService;
-	private Random random = new Random();
+	private final ProductServiceMapper productServiceMapper;
+	private final EntityIdOperator entityIdOperator;
 	
 	public void addProduct(String token, AddProductRequestDto dto) {
 		if (!categoryService.existById(dto.getCategoryId())) {
 			throw new EticaretException(ErrorType.CATEGORY_NOT_FOUND);
 		}
-		Long userId = userService.sellerTokenControl(token);
-		if(dto.categoryId==1){
-			computerProductService.addProduct(dto, userId);
-		}
-		else if(dto.categoryId==2){
-			clothingProductService.addProduct(dto,userId);
-		}
-		else if(dto.categoryId==3){
-			phoneProductService.addProduct(dto, userId);
-		}
+		Optional<String> optionalId = jwtManager.validateToken(token);
+		userService.sellerTokenControl(token);
+		
+		productServiceMapper.getService(dto.getProductType().name().toLowerCase()).addProduct(dto, optionalId.get());
 	}
 	
-//	public boolean existById(Long id) {
-//		return productRepository.existsById(id);
-//	}
-//
-//	public List<Product> getPendingProducts(String token) {
-//		adminTokenControl(token);
-//		return productRepository.findAllByStatus(ProductStatus.PENDING);
-//	}
+	public Optional<Product> findProductById(String productId) {
+		return productServiceMapper.getService(entityIdOperator.extractProductTypeFromProductId(productId)).findById(productId);
+	}
 	
-	private boolean adminTokenControl(String token) {
-		Optional<Long> optUserId = jwtManager.validateToken(token);
-		if (optUserId.isEmpty()) {
-			throw new EticaretException(ErrorType.INVALID_TOKEN);
+	public List<Product> getAllPendingProducts(String token) {
+		userService.adminTokenControl(token);
+		List<Product> allPendingProducts = new ArrayList<>();
+		for (MergedService<? extends Product> service : productServices) {
+			allPendingProducts.addAll(service.findAllByStatus(ProductStatus.PENDING));
 		}
-		Optional<User> optUser = userService.findById(optUserId.get());
-		if (optUser.isEmpty()) {
-			throw new EticaretException(ErrorType.USER_NOT_FOUND);
-		}
-		if (!optUser.get().getRole().equals(Role.ADMIN)) {
+		System.out.println(allPendingProducts);
+		return allPendingProducts;
+	}
+	
+	public Optional<Product> findProductByIdAndType(String productId) {
+		return productServiceMapper.getService(entityIdOperator.extractProductTypeFromProductId(productId)).findById(productId);
+	}
+	
+	
+	public void confirmProductStatus(String token, String id) {
+		if (!userService.adminTokenControl(token)) {
 			throw new EticaretException(ErrorType.UNAUTHORIZED);
 		}
-		return true;
+		Optional<Product> optionalProduct;
+		optionalProduct=productServiceMapper.getService(entityIdOperator.extractProductTypeFromProductId(id)).findById(id);
+			if(optionalProduct.isEmpty()){
+				throw new EticaretException(ErrorType.PRODUCT_NOT_FOUND);
+		}
+		Product product = optionalProduct.get();
+		product.setStatus(ProductStatus.ACCEPTED);
+		productServiceMapper.getService(entityIdOperator.extractProductTypeFromProductId(id)).save(product);
+	}
+
+
+	public void updateProduct(String token, UpdateProductRequestDto dto) {
+		userService.sellerTokenControl(token);
+		if(dto.id()==null) {
+			throw new EticaretException(ErrorType.PRODUCT_NOT_FOUND);
+		}
+		if(!productServiceMapper.getService(entityIdOperator.extractProductTypeFromProductId(dto.id())).existById(dto.id()))
+			throw new EticaretException(ErrorType.PRODUCT_NOT_FOUND);
+		productServiceMapper.getService(entityIdOperator.extractProductTypeFromProductId(dto.id())).update(dto);
 	}
 	
+	public void deleteProduct(String token, String productId) {
+		if (!userService.adminTokenControl(token))
+			throw new EticaretException(ErrorType.UNAUTHORIZED);
+		if (!userService.sellerTokenControl(token))
+			throw new EticaretException(ErrorType.UNAUTHORIZED);
+		if (!productServiceMapper.getService(entityIdOperator.extractProductTypeFromProductId(productId)).existById(productId))
+			throw new EticaretException(ErrorType.PRODUCT_NOT_FOUND);
+		productServiceMapper.getService(entityIdOperator.extractProductTypeFromProductId(productId)).deleteById(productId);
+	}
 	
-//	public void confirmProductStatus(String token, Long productId) {
-//		if (adminTokenControl(token)) {
-//			Optional<Product> optProduct = productRepository.findById(productId);
-//			if (optProduct.isEmpty()) {
-//				throw new EticaretException(ErrorType.PRODUCT_NOT_FOUND);
-//			}
-//			optProduct.get().setStatus(ProductStatus.ACCEPTED);
-//			productRepository.save(optProduct.get());
-//		}
-//	}
-	
-//	public void updateProduct(String token, UpdateProductRequestDto dto) {
-//		if (sellerTokenControl(token).isPresent()) {
-//			Optional<Product> optProductId = productRepository.findById(dto.id());
-//			if (optProductId.isEmpty()) {
-//				throw new EticaretException(ErrorType.PRODUCT_NOT_FOUND);
-//			}
-//			Product product = ProductMapper.INSTANCE.fromUpdateProductDto(dto);
-//			productRepository.save(product);
-//		}
-//	}
-	
-//	public void deleteProduct(String token, Long productId) {
-//		if (adminTokenControl(token)) {
-//			Optional<Product> optProductId = productRepository.findById(productId);
-//			if (optProductId.isEmpty()) {
-//				throw new EticaretException(ErrorType.PRODUCT_NOT_FOUND);
-//			}
-//			productRepository.delete(optProductId.get());
-//		}
-//	}
-
 //	public List<VwProductDisplay> getAllConfirmedProducts() {
 //		Pageable pageable= PageRequest.of(0, 20);
 //		List<VwProduct> productList = productRepository.getNeededFields(pageable);

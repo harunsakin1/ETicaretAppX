@@ -15,9 +15,6 @@ import lombok.experimental.SuperBuilder;
 @Entity
 @Table(name = "tbluser")
 public class User extends BaseEntity{
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
 	String name;
 	String surname;
 	@Email

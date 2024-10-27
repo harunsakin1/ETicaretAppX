@@ -24,30 +24,30 @@ public class GlobalExceptionHandler {
 //		System.out.println(exception.getMessage());
 //		return createResponseEntity(ErrorType.INTERNAL_SERVER_ERROR,HttpStatus.INTERNAL_SERVER_ERROR,null);
 //	}
-
+//
+//
+//	@ExceptionHandler(EticaretException.class)
+//	@ResponseBody
+//	public ResponseEntity<ErrorMessage> eticaretExceptionHandler(EticaretException exception){
+//
+//		// ResponseEntity.ok().build(); -> 200 OK. Success. Herşey yolunda.
+//		// ResponseEntity.badRequest().build(); -> 400 BadRequest yani gelen istek hatalı.
+//		// ResponseEntity.internalServerError(); -> 500 sunucu tarafında bir hata oldu.
+//		return createResponseEntity(exception.getErrorType(),exception.getErrorType().getHttpStatus(),null);
+//	}
 	
-	@ExceptionHandler(EticaretException.class)
-	@ResponseBody
-	public ResponseEntity<ErrorMessage> eticaretExceptionHandler(EticaretException exception){
-		
-		// ResponseEntity.ok().build(); -> 200 OK. Success. Herşey yolunda.
-		// ResponseEntity.badRequest().build(); -> 400 BadRequest yani gelen istek hatalı.
-		// ResponseEntity.internalServerError(); -> 500 sunucu tarafında bir hata oldu.
-		return createResponseEntity(exception.getErrorType(),exception.getErrorType().getHttpStatus(),null);
-	}
-	
-	@ExceptionHandler(MethodArgumentNotValidException.class)
-	@ResponseBody
-	public ResponseEntity<ErrorMessage> methodArgumentNotValidExceptionHandler(MethodArgumentNotValidException exception){
-		List<String> fieldError=new ArrayList<>();
-		exception.getBindingResult().getFieldErrors()
-				.forEach(f->{
-					// f.getField() -> Hata fırlatan nesnenin değişken adı.
-					// f.getDefaultMessage() -> Hataya ait detay bilgisi.
-					fieldError.add("Değişken Adı : "+f.getField()+" - Hata Detayı : "+f.getDefaultMessage());
-				});
-		return createResponseEntity(ErrorType.VALIDATION_ERROR,HttpStatus.BAD_REQUEST,fieldError);
-	}
+//	@ExceptionHandler(MethodArgumentNotValidException.class)
+//	@ResponseBody
+//	public ResponseEntity<ErrorMessage> methodArgumentNotValidExceptionHandler(MethodArgumentNotValidException exception){
+//		List<String> fieldError=new ArrayList<>();
+//		exception.getBindingResult().getFieldErrors()
+//				.forEach(f->{
+//					// f.getField() -> Hata fırlatan nesnenin değişken adı.
+//					// f.getDefaultMessage() -> Hataya ait detay bilgisi.
+//					fieldError.add("Değişken Adı : "+f.getField()+" - Hata Detayı : "+f.getDefaultMessage());
+//				});
+//		return createResponseEntity(ErrorType.VALIDATION_ERROR,HttpStatus.BAD_REQUEST,fieldError);
+//	}
 	
 	public ResponseEntity<ErrorMessage> createResponseEntity(ErrorType errorType,HttpStatus httpStatus,
 	                                                         List<String> fields){

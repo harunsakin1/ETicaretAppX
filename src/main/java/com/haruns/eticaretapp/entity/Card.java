@@ -13,10 +13,7 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "tblcard")
 public class Card extends BaseEntity {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
-	Long userId;
+	String userId;
 	String cardNumber;
 	String expDate;
 	String cvv;

@@ -25,13 +25,22 @@ public class ProductImageController {
 	private final ProductImageService productImageService;
 	
 	@PostMapping(value = ADD_IMAGE_TO_PRODUCT, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<BaseResponse<Boolean>> addImageToProduct(String token,
-	                                                               @ModelAttribute @Valid AddImageToProductRequestDto dto, MultipartFile file)
-			throws IOException {
-		productImageService.addImageToProduct(token, dto, file);
-		return ResponseEntity.ok(BaseResponse.<Boolean>builder().success(true).code(200).data(true)
-		                                     .message("Resim eklendi").build());
+	public ResponseEntity<BaseResponse<Boolean>> addImageToProduct(
+			@RequestParam("productId") String productId,
+			@RequestParam("token") String token,
+			@RequestPart("file") MultipartFile file) throws IOException {
 		
+		AddImageToProductRequestDto dto = new AddImageToProductRequestDto(productId, token);
+		productImageService.addImageToProduct(dto, file);
+		
+		return ResponseEntity.ok(BaseResponse.<Boolean>builder()
+		                                     .success(true)
+		                                     .code(200)
+		                                     .data(true)
+		                                     .message("Resim eklendi")
+		                                     .build());
 	}
+	
+	
 	
 }

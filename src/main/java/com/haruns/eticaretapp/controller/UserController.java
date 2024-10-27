@@ -53,7 +53,9 @@ public class UserController {
 				                         .build());
 	}
 	@PostMapping(LOGIN)
-	public ResponseEntity<BaseResponse<String>> doLogin(@RequestBody @Valid LoginRequestDto dto){
+	public ResponseEntity<BaseResponse<String>> doLogin(@RequestBody @Valid LoginRequestDto dto)
+			throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException,
+			       InvalidKeyException {
 		String token=userService.login(dto);
 		return ResponseEntity.ok(BaseResponse.<String>builder()
 				                         .code(200)
@@ -64,7 +66,9 @@ public class UserController {
 	}
 	
 	@PostMapping(STORE_REGISTER)
-	public ResponseEntity<BaseResponse<Boolean>> storeRegister(@RequestBody @Valid StoreRegisterRequestDto dto){
+	public ResponseEntity<BaseResponse<Boolean>> storeRegister(@RequestBody @Valid StoreRegisterRequestDto dto)
+			throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException,
+			       InvalidKeyException {
 		if (!dto.password().equals(dto.rePassword())) {
 			throw new EticaretException(ErrorType.PASSWORD_ERROR);
 		}

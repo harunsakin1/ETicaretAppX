@@ -13,8 +13,7 @@ import lombok.experimental.SuperBuilder;
 @MappedSuperclass
 public abstract class BaseEntity {
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
+	String id;
 	@Builder.Default
 	Long createdDate=System.currentTimeMillis();
 	@Builder.Default

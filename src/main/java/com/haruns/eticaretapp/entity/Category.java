@@ -13,9 +13,6 @@ import lombok.experimental.SuperBuilder;
 @Entity
 @Table(name = "tblcategory")
 public class Category extends BaseEntity {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
 	@Column(unique = true)
 	String name;
 }

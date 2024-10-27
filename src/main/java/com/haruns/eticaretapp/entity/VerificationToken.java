@@ -9,16 +9,16 @@ import lombok.experimental.SuperBuilder;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 @Data
 @Entity
 @Table(name = "tblverificationtoken")
 public class VerificationToken extends BaseEntity  {
 	String token;
-	Long userId;
+	String userId;
 	Long expDate;
 	
-	public VerificationToken(String token, Long userId) {
+	public VerificationToken(String token, String userId) {
 		this.token = token;
 		this.userId = userId;
 	}

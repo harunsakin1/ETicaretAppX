@@ -7,10 +7,9 @@ import com.haruns.eticaretapp.entity.enums.Role;
 import com.haruns.eticaretapp.exception.ErrorType;
 import com.haruns.eticaretapp.exception.EticaretException;
 import com.haruns.eticaretapp.mapper.AddressMapper;
-import com.haruns.eticaretapp.mapper.UserMapper;
 import com.haruns.eticaretapp.repository.AddressRepository;
+import com.haruns.eticaretapp.utility.EntityIdOperator;
 import com.haruns.eticaretapp.utility.JwtManager;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,9 +21,10 @@ public class AddressService {
 	private final AddressRepository addressRepository;
 	private final UserService userService;
 	private final JwtManager jwtManager;
+	private final EntityIdOperator entityIdOperator;
 	
 	public void addAddress(String token, AddAddressRequestDto dto) {
-		Optional<Long> optUserId = jwtManager.validateToken(token);
+		Optional<String> optUserId = jwtManager.validateToken(token);
 		if (optUserId.isEmpty()) {
 			throw new EticaretException(ErrorType.INVALID_TOKEN);
 		}
@@ -36,6 +36,7 @@ public class AddressService {
 			throw new EticaretException(ErrorType.UNAUTHORIZED);
 		}
 		Address address = AddressMapper.INSTANCE.fromAddAddressDto(dto);
+		address.setId(entityIdOperator.generateUniqueIdForOtherEntities());
 		address.setUserId(optUser.get().getId());
 		addressRepository.save(address);
 		
