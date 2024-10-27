@@ -21,9 +21,11 @@ import java.util.Map;
 @Table(name = "tblsale")
 public class Sale extends BaseEntity{
 	String userId;
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "sale_id")
 	List<SaleItem> saleItems;
 	String billNumber;
-	String address;
+	String addressId;
 	Double totalPrice;
 	PaymentType paymentType;
 	Long saleDate;

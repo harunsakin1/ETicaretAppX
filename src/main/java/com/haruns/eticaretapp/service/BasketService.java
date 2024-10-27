@@ -7,6 +7,7 @@ import com.haruns.eticaretapp.exception.ErrorType;
 import com.haruns.eticaretapp.exception.EticaretException;
 import com.haruns.eticaretapp.repository.BasketItemRepository;
 import com.haruns.eticaretapp.repository.BasketRepository;
+import com.haruns.eticaretapp.repository.SaleItemRepository;
 import com.haruns.eticaretapp.utility.EntityIdOperator;
 import com.haruns.eticaretapp.utility.JwtManager;
 import lombok.RequiredArgsConstructor;
@@ -22,9 +23,12 @@ public class BasketService {
 	private final ProductService productService;
 	private final EntityIdOperator entityIdOperator;
 	private final JwtManager jwtManager;
+	private final SaleItemRepository saleItemRepository;
 	
 	public Basket getOrCreateBasket(String token) {
-		Optional<String> optionalId = jwtManager.validateToken(token); //TODO: Bu kısım hatalı yarın kontrol et!
+		Optional<String> optionalId = jwtManager.validateToken(token);//TODO: Bu kısım hatalı yarın kontrol et!
+		System.out.println(optionalId);
+		System.out.println(token);
 		if(optionalId.isEmpty()) {
 			throw new EticaretException(ErrorType.INVALID_TOKEN);
 		}
@@ -39,6 +43,11 @@ public class BasketService {
 			                                .build();
 			                       return basketRepository.save(basket);
 		                       });
+	}
+	
+	@Transactional
+	public void deleteBasketItem(String basketItemId) {
+		saleItemRepository.deleteById(basketItemId);
 	}
 	
 	@Transactional
@@ -59,8 +68,9 @@ public class BasketService {
 				.unitPrice(productById.get().getPrice())
 				.totalPrice(productById.get().getPrice()* quantity)
 		        .build();
-		Basket usersBasket = getOrCreateBasket(optionalId.get());
-		usersBasket.addItem(basketItemRepository.save(basketItem));
+		Basket usersBasket = getOrCreateBasket(token);
+		BasketItem save = basketItemRepository.save(basketItem);
+		usersBasket.addItem(save);
 		return basketRepository.save(usersBasket);
 	}
 	

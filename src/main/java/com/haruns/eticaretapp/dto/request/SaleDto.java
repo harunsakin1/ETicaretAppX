@@ -15,4 +15,5 @@ import lombok.NoArgsConstructor;
 public class SaleDto {
 	String token;
 	PaymentType paymentType;
+	String addressId;
 }
