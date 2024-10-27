@@ -41,6 +41,7 @@ public class BasketService {
 		                       });
 	}
 	
+	@Transactional
 	public Basket addProductsToBasket(String token, String productId, Integer quantity) {
 		Optional<String> optionalId = jwtManager.validateToken(token);
 		if (optionalId.isEmpty()) {

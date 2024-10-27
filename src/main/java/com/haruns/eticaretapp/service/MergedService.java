@@ -1,6 +1,7 @@
 package com.haruns.eticaretapp.service;
 
 import com.haruns.eticaretapp.dto.request.AddProductRequestDto;
+import com.haruns.eticaretapp.dto.request.ProductFilterDto;
 import com.haruns.eticaretapp.dto.request.UpdateProductRequestDto;
 import com.haruns.eticaretapp.entity.ClothingProduct;
 import com.haruns.eticaretapp.entity.Product;
@@ -17,4 +18,5 @@ public interface MergedService<T> {
 	void save(T product);
 	void update(UpdateProductRequestDto dto);
 	void deleteById(String id);
+	List<T> filterProducts(ProductFilterDto dto);
 }

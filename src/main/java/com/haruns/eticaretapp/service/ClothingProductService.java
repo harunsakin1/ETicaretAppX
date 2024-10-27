@@ -1,6 +1,7 @@
 package com.haruns.eticaretapp.service;
 
 import com.haruns.eticaretapp.dto.request.AddProductRequestDto;
+import com.haruns.eticaretapp.dto.request.ProductFilterDto;
 import com.haruns.eticaretapp.dto.request.UpdateProductRequestDto;
 import com.haruns.eticaretapp.entity.ClothingProduct;
 import com.haruns.eticaretapp.entity.ComputerProduct;
@@ -11,7 +12,9 @@ import com.haruns.eticaretapp.exception.EticaretException;
 import com.haruns.eticaretapp.repository.ClothingProductRepository;
 import com.haruns.eticaretapp.utility.EntityIdOperator;
 import com.haruns.eticaretapp.utility.ProductCodeGenerator;
+import com.haruns.eticaretapp.utility.ProductSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,13 +25,14 @@ import java.util.Optional;
 public class ClothingProductService implements MergedService<ClothingProduct>{
 	private final ClothingProductRepository clothingProductRepository;
 	private final EntityIdOperator entityIdOperator;
+	private final ProductSpecification<ClothingProduct> productSpecification;
 	
 	@Override
 	public void addProduct(AddProductRequestDto dto, String sellerId) {
 		if(dto.getGender()==null && dto.getColor()==null && dto.getClothingSize()==null && dto.getClothingMaterial()==null)
 			throw new EticaretException(ErrorType.MISSING_FIELDS);
 		ClothingProduct clothingProduct=ClothingProduct.builder()
-				.id(entityIdOperator.generateUniqueIdForProducts(dto.getProductType()))
+		                                               .id(entityIdOperator.generateUniqueIdForProducts(dto.getProductType()))
 		                                               .name(dto.getName())
 		                                               .description(dto.getDescription())
 		                                               .brand(dto.getBrand())
@@ -83,4 +87,9 @@ public class ClothingProductService implements MergedService<ClothingProduct>{
 	public void deleteById(String id) {
         clothingProductRepository.deleteById(id);
     }
+	
+	public List<ClothingProduct> filterProducts(ProductFilterDto filterDto){
+		Specification<ClothingProduct> specification = productSpecification.getProductsByFilter(filterDto);
+		return clothingProductRepository.findAll(specification);
+	}
 }

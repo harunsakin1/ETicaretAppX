@@ -34,6 +34,7 @@ public class RestApis {
 	public static final String REMOVE_FROM_CART="/remove-from-cart";
 	public static final String GET_CART="/get-cart";
 	public static final String CLEAR_CART="/clear-cart";
+	public static final String FILTER_PRODUCTS="/filter-products";
 	
 	
 	

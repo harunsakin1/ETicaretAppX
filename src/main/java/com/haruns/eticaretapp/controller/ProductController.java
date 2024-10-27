@@ -1,6 +1,7 @@
 package com.haruns.eticaretapp.controller;
 
 import com.haruns.eticaretapp.dto.request.AddProductRequestDto;
+import com.haruns.eticaretapp.dto.request.ProductFilterDto;
 import com.haruns.eticaretapp.dto.request.UpdateProductRequestDto;
 import com.haruns.eticaretapp.dto.response.BaseResponse;
 import com.haruns.eticaretapp.entity.Product;
@@ -75,6 +76,17 @@ public class ProductController {
 				                         .data(true)
 				                         .success(true)
 		                                     .build());
+	}
+	
+	@PostMapping(FILTER_PRODUCTS)
+	public ResponseEntity<BaseResponse<List<Product>>> filterProducts(@RequestBody ProductFilterDto filterDto){
+		System.out.println(filterDto);
+		return ResponseEntity.ok(BaseResponse.<List<Product>>builder()
+                                         .code(200)
+                                         .message("Ürünler filtreleniyor...")
+                                         .success(true)
+                                         .data(productService.filterProducts(filterDto))
+                                             .build());
 	}
 	
 //	@GetMapping(GET_CONFIRMED_PRODUCTS)

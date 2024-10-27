@@ -1,6 +1,7 @@
 package com.haruns.eticaretapp.service;
 
 import com.haruns.eticaretapp.dto.request.AddProductRequestDto;
+import com.haruns.eticaretapp.dto.request.ProductFilterDto;
 import com.haruns.eticaretapp.dto.request.UpdateProductRequestDto;
 import com.haruns.eticaretapp.entity.ClothingProduct;
 import com.haruns.eticaretapp.entity.ComputerProduct;
@@ -12,7 +13,9 @@ import com.haruns.eticaretapp.exception.EticaretException;
 import com.haruns.eticaretapp.repository.ComputerProductRepository;
 import com.haruns.eticaretapp.utility.EntityIdOperator;
 import com.haruns.eticaretapp.utility.ProductCodeGenerator;
+import com.haruns.eticaretapp.utility.ProductSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,6 +26,7 @@ import java.util.Optional;
 public class ComputerProductService implements MergedService<ComputerProduct>{
 	private final ComputerProductRepository computerProductRepository;
 	private final EntityIdOperator entityIdOperator;
+	private final ProductSpecification<ComputerProduct> productSpecification;
 	@Override
 	public void addProduct(AddProductRequestDto dto, String sellerId) {
 		if(dto.getComputerRam()==null || dto.getComputerCPU()==null || dto.getComputerGPU()==null || dto.getComputerMotherboard()==null || dto.getComputerScreenSize()==null)
@@ -85,4 +89,10 @@ public class ComputerProductService implements MergedService<ComputerProduct>{
 	public void deleteById(String id) {
         computerProductRepository.deleteById(id);
     }
+	
+	@Override
+	public List<ComputerProduct> filterProducts(ProductFilterDto filterDto){
+		Specification<ComputerProduct> specification = productSpecification.getProductsByFilter(filterDto);
+		return computerProductRepository.findAll(specification);
+	}
 }

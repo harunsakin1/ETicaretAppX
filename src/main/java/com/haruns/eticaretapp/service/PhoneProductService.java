@@ -1,6 +1,7 @@
 package com.haruns.eticaretapp.service;
 
 import com.haruns.eticaretapp.dto.request.AddProductRequestDto;
+import com.haruns.eticaretapp.dto.request.ProductFilterDto;
 import com.haruns.eticaretapp.dto.request.UpdateProductRequestDto;
 import com.haruns.eticaretapp.entity.ClothingProduct;
 import com.haruns.eticaretapp.entity.ComputerProduct;
@@ -13,7 +14,9 @@ import com.haruns.eticaretapp.repository.PhoneProductRepository;
 
 import com.haruns.eticaretapp.utility.EntityIdOperator;
 import com.haruns.eticaretapp.utility.ProductCodeGenerator;
+import com.haruns.eticaretapp.utility.ProductSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,6 +28,7 @@ public class PhoneProductService implements MergedService<PhoneProduct>{
 	private final PhoneProductRepository phoneProductRepository;
 	private final ProductCodeGenerator productCodeGenerator;
 	private final EntityIdOperator entityIdOperator;
+	private final ProductSpecification<PhoneProduct> productSpecification;
 	
 	@Override
 	public void addProduct(AddProductRequestDto dto, String sellerId) {
@@ -89,4 +93,10 @@ public class PhoneProductService implements MergedService<PhoneProduct>{
 	public void deleteById(String id) {
         phoneProductRepository.deleteById(id);
     }
+	
+	@Override
+	public List<PhoneProduct> filterProducts(ProductFilterDto filterDto){
+		Specification<PhoneProduct> specification = productSpecification.getProductsByFilter(filterDto);
+		return phoneProductRepository.findAll(specification);
+	}
 }

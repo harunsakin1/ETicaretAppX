@@ -1,6 +1,7 @@
 package com.haruns.eticaretapp.service;
 
 import com.haruns.eticaretapp.dto.request.AddProductRequestDto;
+import com.haruns.eticaretapp.dto.request.ProductFilterDto;
 import com.haruns.eticaretapp.dto.request.UpdateProductRequestDto;
 import com.haruns.eticaretapp.entity.*;
 import com.haruns.eticaretapp.entity.enums.ProductStatus;
@@ -30,6 +31,7 @@ public class ProductService {
 	private final CategoryService categoryService;
 	private final ProductServiceMapper productServiceMapper;
 	private final EntityIdOperator entityIdOperator;
+	private final ComputerProductService computerProductService;
 	
 	public void addProduct(String token, AddProductRequestDto dto) {
 		if (!categoryService.existById(dto.getCategoryId())) {
@@ -40,6 +42,14 @@ public class ProductService {
 		
 		productServiceMapper.getService(dto.getProductType().name().toLowerCase()).addProduct(dto, optionalId.get());
 	}
+	
+	public List<Product> filterProducts(ProductFilterDto filterDto) {
+		List<Product> productList=
+				productServiceMapper.getService(filterDto.getProductType().name().toLowerCase()).filterProducts(filterDto);
+		return productList;
+	}
+	
+	
 	
 	public Optional<Product> findProductById(String productId) {
 		return productServiceMapper.getService(entityIdOperator.extractProductTypeFromProductId(productId)).findById(productId);

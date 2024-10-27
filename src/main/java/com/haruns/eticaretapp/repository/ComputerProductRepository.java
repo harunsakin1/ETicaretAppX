@@ -6,12 +6,14 @@ import com.haruns.eticaretapp.entity.enums.ProductStatus;
 import com.haruns.eticaretapp.view.VwProduct;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface ComputerProductRepository extends JpaRepository<ComputerProduct,String> {
+public interface ComputerProductRepository extends JpaRepository<ComputerProduct,String>,
+                                                   JpaSpecificationExecutor<ComputerProduct> {
 	
 	List<ComputerProduct> findAllByStatus(ProductStatus status);
 	
